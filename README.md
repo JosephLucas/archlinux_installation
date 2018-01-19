@@ -1,393 +1,485 @@
-main inspirations
-https://wiki.archlinux.org/index.php/installation_guide
-https://wiki.archlinux.org/index.php/General_recommendations
-https://wiki.archlinux.fr/installation
-https://wiki.archlinux.org/index.php/ASUS_Zenbook_Prime_UX31A
 
 # Installation of Arch Linux
+The installation process is for UEFI computers, we do not cover BIOS installation process. 
 
-##Download the last iso of Arch Linux
-Use a miiror on https://www.archlinux.org/download/
-I used https://arch.yourlabs.org/iso/2018.01.01/ because i'm in France.
+We rely heavily on: 
+ * rEFInd bootloader
+ * systemd arch linux
+ * xfce4 DE
+ * lightdm DM
 
-## Create a USB arch linux live
+Many steps are relative to a ASUS Zenbook Prime UX32VD machine.
+
+Main inspirations:
+
+    https://wiki.archlinux.org/index.php/installation_guide
+    https://wiki.archlinux.org/index.php/General_recommendations
+    https://wiki.archlinux.fr/installation
+    https://wiki.archlinux.org/index.php/ASUS_Zenbook_Prime_UX31A
+
+
+## Download the last iso of Arch Linux
+Use a mirror listed at https://www.archlinux.org/download/
+
+Being in France, I used https://arch.yourlabs.org/iso/2018.01.01/
+
+## Create an Arch Linux live USB
 Format your usb stick in fat32 (this will destroy your data)
-    
-    mkfs.vfat -n <name_for_your_pendrive> -I /dev/sdc
-
+```bash
+mkfs.vfat -n <name_for_your_pendrive> -I /dev/sdc
+```
 With sdX the USB stick device
-
-    dd bs=4M if=arch.iso of=/dev/sdX
-bs=4M **is** important to make the USB stick bootable 
+```bash
+dd bs=4M if=arch.iso of=/dev/sdX
+``` 
 
 ## Boot from the USB stick in EFI mod
-After booting, switch consol with
+After booting, Enter *root* as login.
 
-    Alt + lateral_arrow
-Enter *root* as login.
+At any time you can switch to another console by pressing `Alt + a lateral arrow`.
 
-    loadkeys fr-latin1
-Verify that computer has booted in efi,
+This can be useful to read a documentation while installing Arch Linux.
 
-    efivar -l
-should be non-null.
+Read offline documentation
+```bash
+less ./install.txt
+```
 
-Offline documentation for the installation
+Set keyboard layout into french AZERTY
+```bash
+loadkeys fr-latin1
+```
+Verify that computer has booted in efi
+```bash
+efivar -l
+```
+output should be non-null.
 
-    elinks /usr/share/doc/arch-wiki/html/index.html
-or
+## Connect to the internet
+Two options: 
+1. use your phone with usb tethering 
+2. activate wifi
 
-    less ./install.txt
+(first option is usually easier).
 
-##Internet
-###4G
-Plug a 4G phone with USB tethering
+### 4G
+1. Plug a 4G phone with USB tethering
+2. exec `dhcpcd` to start a dhcp (Dynamic Host Configuration Protocol) client.
 
-    dhcpcd
-###Wifi
+### Wifi
+#### Using wifi-menu and netctl
+```bash
+wifi-menu
+```
+Give a (name) to the config and enter a password if needed. This writes a file in `/etc/netctl/<name>`.
 
-    wifi-menu
-Give a (name) to the config and enter a password if needed. This writte a file in /etc/netctl/(name). 
 Load this file
-
-    netctl start (name)
-Try the connection
-
-    ping google.com
-Use elinks to browse the internet in CLI (Command Line Interface)
-
-##Online documentation for the installation
-elinks https://github.com/JosephLucas/archlinux_installation
+```bash
+netctl start <name>
+```
+#### Using iw (if previous method is not working)
+Get the name of your wireless interface
+```bash
+iw dev
+```
+To check link status, use following command
+```bash
+iw dev interface link
+```
+You can get statistic information, such as the amount of tx/rx bytes, signal strength etc., with following command
+```bash
+iw dev interface station dump
+```
+Some cards require that the kernel interface be activated before you can use iw or wireless_tools
+```bash
+ip link set interface up
+```
+To see what access points are available
+```bash
+    iw dev interface scan | less
+```
+Connect to an access point
+* No encryption
+    ```bash    
+    iw dev interface connect "your_essid"
+    ```
+* WEP
+    ```bash
+    iw dev interface connect "<your_essid>" key 0:<your_key>
+    ```
+Try to ping google.com
+```bash
+ping google.com
+```
+Use *elinks* to browse the internet in CLI (Command Line Interface), for instance https://wiki.archlinux.org/index.php/Installation_guide
+```bash
+elink https://github.com/JosephLucas/archlinux_installation
+```
+(or https://github.com/JosephLucas/archlinux_installation)
 
 ## Prepare installation
 Update pacman database
+```bash
+pacman -Syy
+```
+set timezone (it seems needed for pacman)
+```bash
+timedatectl set-timezone Europe/Paris
+```
 
-    pacman -Syy
-set the timezone (it seems needed for pacman)
+### Backup a former windows partition
+Tools to list disks on the machine
+```bash
+lsblk 
+lsblk -f
+lsblk -o NAME,SIZE,FSTYPE,MOUNTPOINT,LABEL,PARTLABEL
+lskid
+```
+*ntfsresize* can resize windows partition (shrink or extend) without any previous defragmentation. 
+*ntfsclone* copies ntfs partitions fast.
 
-    timedatectl set-timezone Europe/Paris
+Get how much space is *really* used before resizing the partition
+```bash
+ntfsresize --info
+```
+If exception is raised, like:
 
-###Backup former partitions
-Tools
+    disk has been scheduled for *chkdsk* 
+you may need to relaunch windows. 
+This will launch the *chkdsk* tool to repare some errors in the *ntfs* partition.
 
-    lsblk 
-    lsblk -f
-    lsblk -o NAME,SIZE,FSTYPE,MOUNTPOINT,LABEL,PARTLABEL
-    lskid
+Finally, edit the ntfs partition, for instance
+```bash
+ntfsresize -s -o /mnt/depot_jo/Backup/windows.sepcial.img /dev/sdX
+ntfsresize --no-action --size 100G /dev/sdaX
+ntfsresize -v --size 100G /dev/sdaX
+```
 
-*ntfsresize* can resize windows partition (shrink or extend) without any previous defragmentation. ntfsclone copy ntfs partitions faster, good for backups !
-
-    ntfsresize --info
-This command tells you how much space is *really* used, that gives an advice to further resize the partition.
-If 'disk as been scheduledfor *chkdsk*, you may need to relaunch windows that will launch the *chkdsk* tool to repare some errors in the *ntfs* partition.
-
-    ntfsresize -s -o /mnt/depot_jo/Backup/windows.sepcial.img /dev/sdX
-
-    ntfsresize --no-action --size 100G /dev/sdaX
-    ntfsresize -v --size 100G /dev/sdaX
-###Edit partitions
+### Edit partitions
 Use parted to edit partitions
-
-    parted /dev/sdX 
-    (parted) rm X
-    (parted) mkpart primary ntfs 0% 100GB
-    (parted) mkpart primary ext4 100GB 100%
+```bash
+parted /dev/sdX
+```
+``` 
+(parted) rm X
+(parted) mkpart primary ntfs 0% 100GB
+(parted) mkpart primary ext4 100GB 100%
+```
 Label partitions
+```bash
+mkfs.ntfs -f /dev/sda1 -L windows
+fatlabel ...
+```
+(By experience, I advice you to avoid LVM, you will avoid losing a lot of time for not much help.
+If you really want to, read following section.)
 
-    mkfs.ntfs -f /dev/sda1 -L windows
-    fatlabel ...
+### Manage Logical volumes 
+```bash
+pvcreate ...
+vgcreate ...
+lvcreate ... -L 50GB -n lv_debian
+lvcreate ... -l 100%FREE -n lv_arch_home
+```
 
-(By experience, I advice you to avoid LVM, you will avoid losing a lot of time for not much help)
-Logical volumes (see manuals)
+Instead of `/dev/sdXX`, a lvm partition looks like `/dev/mapper/vg_ssd-lv-root`
 
-    pvcreate ...
-    vgcreate ...
-    lvcreate ... -L 50GB -n lv_debian
-    lvcreate ... -l 100%FREE -n lv_arch_home
+If you plan to resize some logival volumes, do not forget to:
+* shrink the file system **before** shrinking the logical volume
+* extend the logical volume **before** extending the file system)
 
-    If you plan to resize some logival volumes, do not forget to :
-    * shink the file system **before** shrinking the logical volume
-    * extend the logical volume **before** extending the file system)
-
-Do not make a *swap*, use instead a *swap file*, it is more flexible. (https://wiki.archlinux.org/index.php/swap#Swap_file)
-	
-    dd if=/dev/zero of=/swapfile bs=1M count=512
-    chmod 600 /swapfile
-    mkswap /swapfile
-    swapon /swapfile
-Finally, edit fstab to add an entry for the swap file:
-
-    /swapfile none swap defaults 0 0
-
-### Mount partitions
-
-With:
-* /dev/sdXX the partition for root (if lvm, /dev/mapper/vg_ssd-lv-root),
-* /dev/sdYY the partition for home (if lvm, /dev/mapper/vg_hdd-lv-arch_home),
-
-    mount /dev/mapper/vg_ssd-lv-root /mnt
-    mkdir /mnt/home
-    mount /dev/mapper/vg_hdd-lv-arch_home /mnt/home
-
-Mount the EFI System Partition (ESP)
-
-    mkdir -p /mnt/boot/efi
-    mount /dev/sdb1 /mnt/boot/efi
-
-Contrary to the standard mountpoint of the ESP (cf http://www.rodsbooks.com/refind/installing.html) we mount the ESP at /boot. Because rEFInd doesn't seem to read LVM partitions and Arch install bootimages into /boot with pacstrap and mkinitcpio.
+Contrary to the standard mountpoint of the ESP (cf http://www.rodsbooks.com/refind/installing.html) we mount the ESP at /boot. rEFInd doesn't seem to read LVM partitions and Arch install bootimages into /boot with pacstrap and mkinitcpio.
 
 Another solution would be to move the images and the refind_linux.conf from /boot/ (into LVM/ext4) to /boot/efi (into the ESP) each time they are upgraded :
 
     do not launch ! (mv) /boot/initramfs-linux.img /boot/initramfs-linux-fallback.img /boot/refind_linux.conf /boot/vmlinuz-linux /boot/refind_linux.conf /boot/efi
 
-
-## Update the mirror list    
-
-    cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
-    rankmirrors -n 20 /etc/pacman.d/mirrorlist.backup > /etc/mirrolist
-
-## Install Arch
-
-    pacstrap /mnt base base-devel
-    pacstrap /mnt vim 
-Wifi
-
-    pacstrap /mnt iw wpa_supplicant dialog
-(dialog is for wifi-menu and wpa_supplicant for wpa wifi)
-
-Desktop environment
-
-    pacstrap /mnt xfce4 xfce4-goodies xorg-server
-Firefox
-
-    pacstrap /mnt firefox elinks
-
-## Configure Arch
-### Generate the table of file system and mount points
-
-    genfstab -U /mnt >> /mnt/etc/fstab
-
-### Chroot into the newly installed arch
-
-    arch-chroot /mnt
-Give a name to the machine
-
-    echo asus_ux32vd > /etc/hostname
-Give a name for the net
-
-    echo '127.0.0.1 asus_ux32vd.localdomain asus_ux32vd'  >> /etc/hosts
-    ln -sf /usr/share/zoneinfo/Europe/Paris /etc/localtime
-
-### Set local language
-
-    vim /etc/locale.gen
-Then uncomment the line "en_US-UTF-8 UTF-8"
-
-    locale-gen
-    echo LANG="en_US.UTF-8" > /etc/locale.conf
-    export LANG=en_US.UTF-8
-    echo KEYMAP=fr-latin1 > /etc/vconsole.conf
-
-### Set apropriate HOOKS if you use LVM
-If you use LVM, add 'lvm2" in the HOOKS of /etc/mkinitcpio.conf. 
+Just before creating an initial ramdisk environment (mkinitcpio), add 'lvm2" in the HOOKS of /etc/mkinitcpio.conf. 
 
     HOOKS="base udev ... block lvm2 filesystems"
 The order seems important.
 
+### Do not make a swap partition
+Do not make a *swap*, use instead a *swap file*, it is more flexible. (see https://wiki.archlinux.org/index.php/swap#Swap_file)
+
+### Mount partitions
+With:
+* `/dev/sdXX` the partition for root 
+* `/dev/sdYY` the partition for home 
+```bash
+mount /dev/sdXX /mnt
+mkdir /mnt/home
+mount /dev/sdYY /mnt/home
+```
+Mount the EFI System Partition (ESP)
+```bash
+mkdir -p /mnt/boot/efi
+mount /dev/sdb1 /mnt/boot/efi
+```
+### Rank pacman mirrors    
+```bash
+cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
+rankmirrors -n 20 /etc/pacman.d/mirrorlist.backup > /etc/mirrolist
+```
+
+## Install Arch
+```bash
+pacstrap /mnt base base-devel
+pacstrap /mnt vim
+``` 
+Install Wifi; wpa_supplicant is for wpa/wep support
+```bash
+pacstrap /mnt iw wpa_supplicant
+```
+(You could also install dialog for a wifi-menu)
+
+Install a desktop environment
+```bash
+pacstrap /mnt xfce4 xfce4-goodies xorg-server
+```
+Install Firefox (and elinks, just in case you cannot start the graphic server)
+```bash
+pacstrap /mnt firefox elinks
+```
+### Generate the table of file system and mount points
+```bash
+genfstab -U /mnt >> /mnt/etc/fstab
+```
+### Chroot into the newly installed arch
+```bash
+arch-chroot /mnt
+```
+Give a name to the machine (for instance asus_ux32vd)
+```bash
+echo <name> /etc/hostname
+```
+Give a name for the net
+```bash
+echo '127.0.0.1 asus_ux32vd.localdomain asus_ux32vd'  >> /etc/hosts
+ln -sf /usr/share/zoneinfo/Europe/Paris /etc/localtime
+```
+### Set local language
+```bash
+vim /etc/locale.gen
+```
+Then uncomment the line `en_US-UTF-8 UTF-8`
+```bash
+locale-gen
+echo LANG="en_US.UTF-8" > /etc/locale.conf
+export LANG=en_US.UTF-8
+echo KEYMAP=fr-latin1 > /etc/vconsole.conf
+```
 ### Customize pacman
+```bash
+vim /etc/pacman.conf
+```
+* uncomment `Color`
+* add line `ILoveCandy` for a funny animation when installing packages with pacman 
+* uncomment `multilib` repo if you want to enable running and building 32-bit applications on 64-bit installations of Arch Linux. 
 
-    vim /etc/pacman.conf
-* uncomment *Color*
-* add line *ILoveCandy*
-* uncomment *multilib* repo
-
-### Init ramdisk environment at boot
-
-    mkinitcpio -p linux
-
-### install a boot loader 
+### Create an initial ramdisk environment 
+```bash
+mkinitcpio -p linux
+```
+### Install the boot loader rEFInd 
 Here we use rEFInd.
-
-    pacman -S refind-efi
-    refind-install
-    vim /boot/refind_linux.conf
-remove the 2 first lines that correspond to the USB Live Arch.
-
+```bash
+pacman -S refind-efi
+refind-install
+vim /boot/refind_linux.conf
+```
+You might need to remove the 2 first lines that may correspond to the Arch Linux Live USB.
 ### Set a password for the root
-
-    passwd
-
+```bash
+passwd
+```
 ### Reboot
+`Ctr + D`
+```bash
+unmount -R /mnt
+reboot
+```
 
-    Ctr + D
-    unmount -R /mnt
-    shutdown 0
-
-## After
+## Post-Installation configuration
 
 ### Micro-code of Intel CPUs
-Look for your model here, if you need that.
+Look for your processor model at 
 https://downloadcenter.intel.com/fr/product/65707/Intel-Core-i5-3317U-Processor-3M-Cache-up-to-2-60-GHz-
 
-    pacman -S intel-ucode
-    vim /boot/refind_linux.conf
-add 
+If you need microcode,
+```bash 
+pacman -S intel-ucode
+vim /boot/refind_linux.conf
+```
+and add the line
+`'initrd=/boot/intel-ucode.img initrd=/boot/initramfs-linux.img'`
 
-    'initrd=/boot/intel-ucode.img initrd=/boot/initramfs-linux.img'
+### Activate TRIM (for saving your an SSD lifetime)
+Following https://wiki.archlinux.org/index.php/Solid_Statea_Drives#Maximizing_performance
 
-### TRIM (for saving your ssd lifetime)
-https://wiki.archlinux.org/index.php/Solid_Statea_Drives#Maximizing_performance
-
-    lsblk -D
-
-non-0 DISK-GRAN or DISK-MAX means that the device support TRIM.
+Check if you have a ssd disk with a TRIM available 
+```bash
+lsblk -D
+```
+non-0 DISK-GRAN or DISK-MAX means that the device supports TRIM.
 
 Enable fstrim.timer to be started on bootup
-
-    systemctl enable fstrim.timer
-
-### optimize SSD
-https://wiki.archlinux.fr/SSD#Option_de_montage_noatime
+```bash
+systemctl enable fstrim.timer
+```
+### Optimize SSD
+From https://wiki.archlinux.fr/SSD#Option_de_montage_noatime
 
 Add option **noatime** in /etc/fstab for partitions on the ssd. ()
 
-### XFCE
+### Desktop environment xfce4
 Start the graphical window manager
+```bash
+startxfce4
+```
+### Install xfce4-goodies
+```bash
+pacman -S xfce4-goodies
+```
+Change icon `/usr/share/icons/hicolor/48x48/apps/xfce4-time-out-plugin.png` because it graphically ressemble the clock icon.
 
-    startxfce4
+Within a xfce4 grpahical session switch to a consol tty
 
-###Unmute sound 
+    ctr + alt + fX 
+(with X in [1-6])
 
-    pacman -S alsa-utils
-    alsamixer
+To come back to the xfce4 session 
 
+    ctr + alt + f7 
+(ctr + alt + f1 doesn't work for unknown reasons)
+### Unmute sound 
+```bash
+pacman -S alsa-utils
+alsamixer
+```
 unmute the master channel (MM) by selecting it and pressing 'm', then increase volume untill reaching a 0dB filtering.
-
-    pacman -S pulseaudio
-You might need 
-
-    pacman -S xfce-pulseaudio-plugin
-    pacman -S pavucontrol
-    
+```bash
+pacman -S pulseaudio
+```
+You might need
+```bash 
+pacman -S xfce-pulseaudio-plugin
+pacman -S pavucontrol
+```
 and might also need to restart.
+### Configure an automatical connection to the internet
+```bash
+ip link show
+```
+Note the names of the interfaces (for instance 'lo' and 'wlp3s0').
 
-### configure internet
-(remplacant de ifconfig)
-
-    ip link show
-Note the names of the interfaces : here 'lo' and 'wlp3s0'.
-
-Automatically connect to the wifi 
-https://wiki.archlinux.fr/Netctl#Connexion_automatique_.C3.A0_un_profil
-
-    pacman -S wpa_actiond
-    systemctl enable netctl-auto@wlp3s0.service
-
-Connection automatic en filaire
-
-    systemctl enable netctl-auto@lo.service
-
-###User
-    pacman zsh
-    useradd -m -g wheel -s /bin/zsh <user>
-    passwd <user>
- 
-###Make zsh the default shell
-
-    pacman -S zsh
+Automatically connect to the wifi (https://wiki.archlinux.fr/Netctl#Connexion_automatique_.C3.A0_un_profil)
+```bash
+pacman -S wpa_actiond
+systemctl enable netctl-auto@wlp3s0.service
+```
+Automatic ethernet connection
+```bash
+systemctl enable netctl-auto@lo.service
+```
+### Create a non-root user
+with default shell = ZSH
+```bash
+pacman -S zsh
+useradd -m -g wheel -s /bin/zsh <user>
+passwd <user>
+ ```
+ If needed, give sudo rights to `<user>`
+```bash
+visudo
+```
+### Make zsh the default shell
+(NB: Overall ranking of zsh configs seems to be `grml-zsh-config` > `prezto` > `Oh-my-zsh.` The two former frameworks are bloated. 
+From https://www.reddit.com/r/unixporn/comments/48wmfr/zsh_users_which_do_you_prefer_oh_my_zsh_or_prezto/)
 Install the default config for arch (same as in the USB stick)
-
-    pacman -S grml-zsh-config
-    chsh -l
-    chsh -s /bin/zsh
-
-###Config Zsh
-Overall grml-zsh-config > prezto > Oh-my-zsh. The two former frameworks are bloated. (https://www.reddit.com/r/unixporn/comments/48wmfr/zsh_users_which_do_you_prefer_oh_my_zsh_or_prezto/)
-
-% If ever another configuration is intended
-[comment]: <> (If you want to install the configuration of the ZSH of manjaro (see file *zshrc_manjaro* attached) )
-[comment]: <> ()
-[comment]: <> (    #enable fish-like style features)
-[comment]: <> (    sudo pacman -S zsh-syntax-highlighting)
-[comment]: <> (    pacaur -S zsh-history-substring-search-git)
-[comment]: <> (    pacaur -S zsh-autosuggestions)
-[comment]: <> (    sudo pacman -S lsb-release)
-[comment]: <> ()
-[comment]: <> (In the manjaro zhrc, change)
-[comment]: <> ()
-[comment]: <> (    echo $USER@$HOST  $(uname -srm) $(lsb_release -rcs[)
-[comment]: <> ()
-[comment]: <> ()
-[comment]: <> ()
-[comment]: <> (    echo $USER@$HOST  $(uname -srm) $(lsb_release -rs))
-[comment]: <> ()
-[comment]: <> (If grml-zsh-config is installed, add a first line in ~/.zshrc)
-[comment]: <> ()
-[comment]: <> (    add-zsh-hook -d precmd prompt_grml_precmd)
-[comment]: <> ()
-[comment]: <> (whenever you want to customize your prompt. (see https://www.reddit.com/r/archlinux/comments/50sfdq/unable_to_change_zsh_command_prompt/))
-
-
-
-###Dipsplay manager (TODO: switch to lightdm)
-
-    pacman -S lxdm
-
-I had trouble with the default keyboard in lxdm (the one of Xorg) and I needed to set the french azerty (with 'é'). For this I found some help on the internet.
-
-https://wiki.gentoo.org/wiki/Keyboard_layout_switching
-https://forum.voidlinux.eu/t/change-default-keyboard-for-lxdm-to-local-layout/972
-
-An (ugly) solution is to create a /etc/X11/xorg.conf file with
-
-    Section "InputClass"
-    Identifier "system-keyboard"
-    MatchIsKeyboard "on"
-    Option "XkbLayout" "fr"
-    Option "XkbModel" "pc105"
-    Option "XkbVariant" "azerty"
-    Option "XkbRules" "evdev"
-    Option "XkbOptions" "terminate:ctrl_alt_bksp"
-    EndSection
-
-###Swap file
-https://wiki.archlinux.org/index.php/Swap#Swap_file
-
-    fallocate -l 4G /swapfile
-    chmod 600 /swapfile
-    mkswap /swapfile
-    swapon /swapfile
-
-edit /etc/fstab and add
+```bash
+pacman -S grml-zsh-config
+```
+List available shells
+```bash
+chsh -l
+```
+Make zsh the default shell
+```bash
+chsh -s /bin/zsh
+```
+### Install a Windows Display Manager
+```bash
+lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings
+systemctl enable lightdm
+```
+### Switch xfce4 and lightdm into azerty
+```bash
+localctl --no-convert set-x11-keymap fr
+``` 
+### Swap file
+(see https://wiki.archlinux.org/index.php/Swap#Swap_file)
+```bash
+fallocate -l 4G /swapfile
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+```
+edit `/etc/fstab` to add an entry for the swap file:
 
     /swapfile	none	swap	defaults	0 0
 
-    pacman -S systemd-swap
-    set 'swapfu_enabled=1' in the Swap File Universal section of /etc/systemd/swap.conf
-    systemctl enable systemd-swap.service
-
-####Swappiness
-Current
-
-    cat /proc/sys/vm/swappiness
-Edit /etc/sysctl.d/99.sysctl.conf
+Then
+```bash 
+pacman -S systemd-swap
+```
+set `swapfu_enabled=1` in the Swap File Universal section of `/etc/systemd/swap.conf`
+```bash 
+systemctl enable systemd-swap.service
+```
+#### Swappiness
+Show current swappiness
+```bash
+cat /proc/sys/vm/swappiness
+```
+Edit `/etc/sysctl.d/99.sysctl.conf`
+```bash
 vm.swappiness=15
+```
+When 85% RAM is used (15% of free ram is remaining), the kernel is allowed to use the swapfile.
 
-From 85% of used RAM (15% of free ram), the kernel is allowed to use the swapfile.
+### Setting touchpad
+In  Applications > Setting > Mouse and Touchpad, set tap click and scrolling.
 
-###Customize rEFInd
+(If necessary install xf86-input-synaptics with pacman and read https://wiki.archlinux.fr/Touchpad_Synaptics)
+
+### Auto-mount USB devices
+```bash
+pacman -S udisks2 
+pacman -S thunar-volman gvfs
+```
+Maybe an easier solution (not tested)
+In Thunar (default folder/files manager of xfce4)
+    Edit -> Preferences
+    Tab « Advanced » on the right
+    Check « activate device manager »
+
+### Removable drives and media
+Applications > Settings > Appearance > Removable drives and media
+Check 'Automatically mount' 
+
+### Customize rEFInd
 Download asus logo http://logo-logos.com/wp-content/uploads/2016/10/Asus_logo_black_and_white.png
-Edit the asus logo with gimp (pacman -S gimp imagemagick) to shrink it to 800 in width and 24 color bit depth.
-
-    convert -colors 256 -depth 24 +dither ~/Desktop/logo_asus.png ~/Desktop/logo_asus_24b.png
-
-download snowy icons https://sourceforge.net/projects/refind/files/themes/
+Edit the asus logo with gimp `pacman -S gimp imagemagick` to shrink it to 800 in width and 24 color bit depth.
+```bash
+convert -colors 256 -depth 24 +dither ~/Desktop/logo_asus.png ~/Desktop/logo_asus_24b.png
+```
+Download snowy icons (https://sourceforge.net/projects/refind/files/themes/)
+```bash
 pacman zip unzip
+```
+Move the logo and the snowy folder in /boot/EFI/refind/themes (`mkdir /boot/EFI/refind/themes`)
 
-mkdir /boot/EFI/refind/themes
-put the logo and the snowy folder in /boot/EFI/refind/themes
-
-at the end of /boot/EFI/refind/refind.conf write
+at the end of `/boot/EFI/refind/refind.conf` write
 
     # Personal config
     banner /EFI/refind/themes/logo_asus_24b.png
@@ -406,66 +498,40 @@ at the end of /boot/EFI/refind/refind.conf write
     }
 
 Change 'scanfor manual' to hide other unconfigured bootloaders.
-
-###Install pacaur (TODO: pacaur is dead, switch to trizen https://www.youtube.com/watch?v=Hx-8GFBtV6I)
-
-Switch to a user without sudo power (as soon as you install AUR packages)
-
-    cd /tmp
-    git clone --depth=1 https://aur.archlinux.org/cower.git
-    cd cower
-    gpg --recv-keys --keyserver hkp://pgp.mit.edu 1EB2638FF56C0C53
-    makpkg -sri
-    cd ..
-    git clone --depth=1 https://aur.archlinux.org/pacaur.git
-    cd pacaur
-    makepkg -sri
-
-###AUR install 
-Sublime text editor (still with a non-sudo-user)
-    
-    pacaur -S sublime-text
-
+### Trizen for AUR packages
+```bash
+git clone https://aur.archlinux.org/trizen-git.git
+cd trizen-git
+makepkg -si
+cd -
+```
+### Pycharm
 IDE python : pychamr
-    
-    pacaur -S pycharm-community-edition
-
+```bash
+pacman -S pycharm-community-edition
+```
 Set pycharm diff tool has the default diff tool (not recommanded, since pycharm is quite slow... use meld instead)
-
-    #sudo echo 'export DIFFPROG="pycharm diff"' >> ~/.zshrc
-
-    sudo DIFFPROG='pycharm diff' pacdif
-
-####Install Meld for file/folder/vcs comparisons
-
-    sudo echo 'export DIFFPROG="meld"' >> ~/.zshrc
-    pacman -S meld
-
-####Install a dark Arch linux theme for LXDM
-
-    pacaur -S lxdm-themes
-
-list all available themes 
-
-    ls /usr/share/lxdm/themes
-    vim /etc/lxdm/lxdm.conf
-
-change 
-
-    theme=Archlinux
-
-####Set a dark Arch linux theme for XFCE + some tweaks/tunings
-
+```bash
+sudo echo 'export DIFFPROG="pycharm diff"' >> ~/.zshrc
+sudo DIFFPROG='pycharm diff' pacdiff
+```
+### Install Meld for file/folder/vcs comparisons
+```bash
+sudo echo 'export DIFFPROG="meld"' >> ~/.zshrc
+pacman -S meld
+```
+### Set a dark Arch linux theme for XFCE + some tweaks/tunings
 Install a dark gtk theme
-
-    pacaur -S gtk-theme-arc-git
-
+```bash
+trizen -S gtk-theme-arc-git
+```
 Applications > Settings > Appearance > Arc-Dark
 Applications > Settings > Window Manager > Arc-Dark
 
 Install an extension for black background on firefox
-
-    'Dark Background and Light Text'
+```bash
+``'Dark Background and Light Text'
+```
 
 Set wallpaper : http://cinderwick.ca/files/archlinux/wallpaper/archlinux-xfce-azul.jpg
 
@@ -474,23 +540,24 @@ Remove some icons (specially important for avoiding drag-n-drop in root)
 Settings > Desktop > Icons > (uncheck 'FileSystem' and 'Removable Devices') 
 
 Install icons
-
-    pacman -S arc-icon-theme 
+```bash
+pacman -S arc-icon-theme
+``` 
 
 Settings > Appearance > Icons > Arc
 
-###Monitoring CPU,RAM,SWAP
+### Monitoring CPU,RAM,SWAP with conky
 
+```bash
 pacman -S conky
-
 mkdir -p ~/.config/conky
 conky -C > ~/.config/conky/conky.conf
-
-add in the config file
+```
+Add in the config file
 
     background = true,
 
-Add a ~/.config/autostart/conky.desktop:
+Add a `~/.config/autostart/conky.desktop`:
 
     [Desktop Entry]
     Encoding=UTF-8
@@ -522,15 +589,15 @@ Add transparency
 
 (documentation http://conky.sourceforge.net/config_settings.html)
 
-###Plank dock (Macos like panel)
-
-    pacaur -S pacaur -S plank-theme-arc
-
-remove the anchor icon
-
-    gconftool-2 --type Boolean --set /apps/docky-2/Docky/Items/DockyItem/ShowDockyItem False 
-
-solve icon of sublime the cannot be toggled to the dock (http://www.techbear.co/sublime-debian-plank/)
+### Plank dock (Macos like panel)
+```bash
+trizen -S pacaur -S plank-theme-arc
+```
+Remove the anchor icon
+```bash
+gconftool-2 --type Boolean --set /apps/docky-2/Docky/Items/DockyItem/ShowDockyItem False
+``` 
+Solve icon of sublime the cannot be toggled to the dock (http://www.techbear.co/sublime-debian-plank/)
 
     sudo ln -s /opt/sublime_text/sublime_text /usr/bin/sublime
 
@@ -561,230 +628,223 @@ solve icon of sublime the cannot be toggled to the dock (http://www.techbear.co/
     Icon=sublime-text
     
     
-###Albert (fast launcher from keywords)
-
-    pacaur -S albert
- 
-###Install xfce4-goodies !!!
-
-    pacman -S xfce4-goodies
-
-change icon /usr/share/icons/hicolor/48x48/apps/xfce4-time-out-plugin.png (because it interfers with clock)
-
-###if trouble editing the account top-left xfce window-like start-app 
-
-    pacaur -S mugshot
-
-###Instant messagery
-
-    pacman -S pidgin
-
+### Albert (fast launcher from keywords)
+```bash
+trizen -S albert
+```
+### Fix trouble editing the account top-left xfce window-like start-app 
+ ```bash
+trizen -S mugshot
+ ```
+### Instant messagery with Pidgin
+```bash
+pacman -S pidgin
+pacman -S purple-facebook
+pacaur -S telegram-purple
+pacman -S purple-skypeweb
+```
 Note that pidgin may play a sound at startup. This can be deactivated Tools > Mute sounds
-
-    pacman -S purple-facebook
-    pacaur -S telegram-purple
-    pacman -S purple-skypeweb
 
 For minimized window at start: Tools > check Extended Preferences > configure plugin > Hide buddy list at startup
 
-    pacaur -S pidgin-extprefs
+```bash
+trizen -S pidgin-extprefs
+```
+Have a look at https://github.com/JD342/arc-thunderbird-integration
 
-and
-
-https://github.com/JD342/arc-thunderbird-integration
-
-###Removable drives and media
-
-    Applications > Settings > Appearance > Removable drives and media
-
-    Automatically mount 
-
-###Setting touchpad
-
-Applications > Setting > Mouse and Touchpad
-(set tap click and scrolling)
-
-if necessary install xf86-input-synaptics with pacman and read https://wiki.archlinux.fr/Touchpad_Synaptics
-
-
-###Mail client : neomutt (need wget : pacman -S wget)
-
+### Mail client : neomutt
+NB: need wget : `pacman -S wget`
 see https://www.neomutt.org/distro/arch
-
-    mkdir -p /tmp/makepkg && cd /tmp/makepkg
-    wget https://aur.archlinux.org/cgit/aur.git/snapshot/neomutt.tar.gz
-    tar xf neomutt.tar.gz
-    cd neomutt
-    makepkg -si
-
-###Drivers
-#### graphic cards
+```bash
+mkdir -p /tmp/makepkg && cd /tmp/makepkg
+wget https://aur.archlinux.org/cgit/aur.git/snapshot/neomutt.tar.gz
+tar xf neomutt.tar.gz
+cd neomutt
+makepkg -si
+```
+### Drivers
+#### NVIDIA optimus graphic cards
 (see https://wiki.archlinux.org/index.php/NVIDIA_Optimus)
+
+Find out the model of your graphic card
+```bash
 lspci | grep -E "VGA|3D"
+```
 
 ### Graphic cards (Optimus = (HD4000 + Geforce GT 620 M))
-
 https://www.reddit.com/r/linux_gaming/comments/6ftq10/the_ultimate_guide_to_setting_up_nvidia_optimus/
 
 1) install bumblebee
 
 https://wiki.archlinux.org/index.php/Bumblebee#Installing_Bumblebee_with_Intel.2FNVIDIA
-    
-    pacman -S bumblebee mesa nvidia lib32-virtualgl lib32-nvidia-utils
-
+```bash
+pacman -S bumblebee mesa nvidia lib32-virtualgl lib32-nvidia-utils
+```
 (Note xf86-video-intel does not seem necessary)
 
 Add <user> to the group that is allowed to run bumblebee
-
-    gpasswd -a <user> bumblebee
-    systemctl enable bumblebeed.service
-
+```bash
+gpasswd -a <user> bumblebee
+systemctl enable bumblebeed.service
+```
 Tester (optirun a des meileurs performances que primusrun)
-
-    pacman -S virtualgl
-    glxspheres64
-        
-    optirun glxspheres64
-    optirun glxspheres32
-
-2) Installer nvidia-xrun
-    
-    pacaur -S nvidia-xrun
-    pacman -S openbox
-    sudo pacman -S openbox
-
-In ~/.nvidia-xinitrc
+```bash
+pacman -S virtualgl
+glxspheres64
+```
+```bash
+optirun glxspheres64
+optirun glxspheres32
+```
+2) Install nvidia-xrun and the lightweight Desktop Environment
+```bash
+trizen -S nvidia-xrun
+pacman -S openbox
+sudo pacman -S openbox
+```
+In ~/.nvidia-xinitrc, add the lines
 
     # start the window manager
     openbox-session
 
 Configure Openbox (https://wiki.archlinux.org/index.php/openbox#Configuration)
-
-    cp -R /etc/xdg/openbox ~/.config/
-
-In ~/.config/openbox/autostart
+```bash
+cp -R /etc/xdg/openbox ~/.config/
+```
+In ~/.config/openbox/autostart, add the lines
 
     # personal config (jlucas)
     #
     # change  keyboard to fr-latin1 (azerty)
     (sleep 2s && setxkbmap fr-latin1 oss) &
     
-Switch the DE (or )
+Next lines describe how to Activate the Geforce gt 620 M in openbox.
 
-    xfce4-session-logout
-
+Logout from the xfce4 DE
+```bash
+xfce4-session-logout
+```
 Switch to a tty; e.g. 
+    
     Ctr+Alt+F2
 
-Activate the geforce gt 620 M in openbox
+Activate the Geforce 620M and start openbox DE with this graphical acceleration
+```bash
+nvidia-xrun
+```
+Load AZERTY keyboard layout
+```bash
+setxkbmap fr oss
+```
+If you want to use XFCE config tools within openbox (switch keyboard layout): 
+```bash
+xfce4-mcs-manager
+```
+In the light-weight DE openbox you can now launch the 3D application.
 
-    nvidia-xrun
-
-If you want to use XFCE config tools in openbox : 
-
-    xfce4-mcs-manager
-
-In the light-weight DE openbox, launch the application
 For instance open a terminal and 
-
-    glxspheres64
-
+```bash
+glxspheres64
+```
 Performances should be impressive !
 
 For stats about the video card
-
-    nvidia-settings -q screens -q gpus -q framelocks -q fans -q thermalsensors
-
+```bash
+nvidia-settings -q screens -q gpus -q framelocks -q fans -q thermalsensors
+```
 (terse option, add : -t)
 
-###Wine
-wine-staging est la branche dev de wine, mais avec de sacrées améliorations !
-
-    sudo pacman -S wine-staging 
-
-Pour le son 
-
-    sudo pacman -Qs lib32-libpulse
-    
-Note : It would also be intersting to look also at the package 'wine-staging-nine' for improvements of DirectX9 games with gallium patches.
+### Wine (allow executing some windows applications natively)
+wine-staging the dev branch of wine, but with impressive improvements !
+```bash
+sudo pacman -S wine-staging
+``` 
+For sound 
+```bash
+sudo pacman -Qs lib32-libpulse
+```
+(It might be interesting to look also at the package 'wine-staging-nine' for improvements of DirectX9 games with gallium patches.)
 
 Configure wine
-    
-    wine winecfg 
-    (or winecfg maybe...)
-    wine control
+```bash
+wine winecfg
+``` 
+```bash
+wine control
+```
 
 For Battlenet : https://wiki.archlinux.org/index.php/Blizzard_App
 
 Install
+```bash
+pacman -S winetricks lib32-gnutls lib32-libldap
+winetricks corefonts
+```
+### Htop
+```bash
+pacman -S htop
+```
+### VLC
+```bash
+pacman -S vlc qt4 libcdio
+```
+### Nextcloud (fork of Owncloud)
+```bash
+pacman -S nextcloud-client libgnome-keyring
+```
+libgnome-keyring is necessary to store the password
 
-    pacman -S winetricks lib32-gnutls lib32-libldap
-    winetricks corefonts
+### Pdf viewer
+```bash
+trizen -S acroread
+```
 
-###Auto-mount USB devices
+### Fix screen tearing issues with the default window compositor of xfce4
+XFCE default compositing window manager (https://wiki.archlinux.org/index.php/Xorg#Composite) and default nvidia configuration had me experience screen tearing.
 
-    pacman -S udisks2 
-    pacman -S thunar-volman gvfs
+A solution is to install *compton*, a 'compositing window manager
 
-Ou peut-être plus simple (pas testé)
-Dans Thunar (gestionnaire de fichiers) que ça se passe.
-    Éditer -> Préférences
-    Onglets « Avancée » tout à droite
-    Cocher « activer le gestionnaire de volume »
+Deactivate default xfce composite manager (window manager tweak-> manager->Disable) and installing compton 
+```bash
+pacman -S compton
+```
+then follow 
+https://ubuntuforums.org/showthread.php?t=2144468&p=12644745#post12644745
+for configuration with xfce.
 
-###Htop
+Other tried solution (Tried and crashed my graphic server):
 
-	pacman -S htop
-
-###VLC
-
-    pacman -S vlc
-
-    I was necessary for me to install qt4
-
-    pacman -S qt4
-
-###owncloud
-
-pacman -S owncloud-client libgnome-keyring
-libgnome-keyring is to store the password
-
-I prefer 
-
-    pacaur -S nextcloud-client
-
-
-###Pdf viewer
-
-    pacaur -S acroread
-
-## install compton, a 'compositing window manager'
-(SKIP this first suggetion!)
-XFCE default compositing window manager (https://wiki.archlinux.org/index.php/Xorg#Composite) and default nvidia configuration had me experience screen tearing
-
-I solved it with
 https://wiki.archlinux.org/index.php/Intel_graphics#Tear-free_video
 
-I created file : /etc/X11/xorg.conf.d/20-intel.conf
+I created file : `/etc/X11/xorg.conf.d/20-intel.conf`
 with :
 
 	Section "Device"
 	  Identifier  "Intel Graphics"
 	  Driver      "intel"
 	  Option "TearFree" "true"
-	EndSection
+	EndSection 
 
-(Another solution would be to deactivate default xfce composite manager (window manager tweak-> manager->Disable) and installing compton 
-    pacman -S compton
-then follow 
-https://ubuntuforums.org/showthread.php?t=2144468&p=12644745#post12644745
-for configuration with xfce)
+### xfce screenshooter shortcut keys
 
-### pair bose quiet confort q35
+Setting Manager -> Keyboard -> Application Shortcuts and add the command "/usr/bin/xfce4-screenshooter"
+
+## Manager of archives : 
+(same as ubuntu's)
+```bash
+pacman -S file-roller
+```
+## Hints and unsuccessful tries
+
+### Bluetooth pairing of the headset, Bose Quiet Confort q35
+NB: I didn't manage to enable bluetooth connection -> plug it with a jack wire
+
+Unsuccessful try:
+
 https://eklausmeier.wordpress.com/2016/10/26/bluetooth-headphones-in-arch-linux/
 https://wiki.archlinux.org/index.php/Blueman
 
-(Note existence of https://github.com/Denton-L/based-connect
+(Note the existence of https://github.com/Denton-L/based-connect
 sudo pacaur -S based-connect-git)
 
 sudo pacman -S bluez bluez-utils
@@ -829,57 +889,113 @@ Copy/paste these lines inside. Do not change anything. The order is important.
     AutoConnect=true
     load-module module-switch-on-connect
 
-##xfce screenshooter shortcut keys
 
-Setting Manager -> Keyboard -> Application Shortcuts and add the command "/usr/bin/xfce4-screenshooter"
+## List of interesting packages
+Manage your money (allow connection to your bank account with specific protocols)
+`gnucash` 
+Edit pdfs
+`masterpdfeditor`
+Analyse Disk usage
+`baobab`
+Shift colors depending on the hour of the day (help your eyes hurt less if you are working in front of the screen at night)
+`redshift`
 
-
-## manager of archives : 
-(same as ubuntu's)
-pacman -S file-roller
+It might be interesting to have a look at 
+    
+    i3 rofi w3m ranger mutt mpd newsbeuter pass
+and 
+    
+    visual studio code
+    bash debug: bashdb (also a plugin for visual studio code)
+    shellcheck (also a plugin pycharm)
 
 ## TODO
-
-swap file
 Wayland (emulate Xserver with xWayland)
-install graphic cardds : https://www.reddit.com/r/linux_gaming/comments/6ftq10/the_ultimate_guide_to_setting_up_nvidia_optimus/
-régler le problème avec wifi-menu
-activer les HOOKS kvm et docker
-compton : tear-free syncronization on XFCE
+installation process for docker and virtualbox
+activates HOOKS requested for kvm et docker
 use Wayland or XWayland as soon as XFCE allows it
 
-## installer :
-gnucash
-masterpdfeditor
-pycharm
-baobab redshift
-
-# Index
-* Arch linux Rollback Machine (ARM)
-* Arch Linux Archive (ALA) where previous versions of packages are archived
-* 
-#Tricks
+## Tips
 Use TestDisk or parted in rescue mod to rescue erroneous partion tables
 
+## Glossary
+Arch linux Rollback Machine (ARM)
+Arch Linux Archive (ALA) where previous versions of packages are archived
 
+## Obsolete
 
-INPROGRESS
+### Manjaro ZSH configuration (switched to grml)
+If you want to install the configuration of the ZSH of manjaro (see file *zshrc_manjaro* attached) 
+```bash
+#enable fish-like style features
+sudo pacman -S zsh-syntax-highlighting
+pacaur -S zsh-history-substring-search-git
+pacaur -S zsh-autosuggestions
+sudo pacman -S lsb-release
+```
+In the manjaro zhrc, change
+```bash
+echo $USER@$HOST  $(uname -srm) $(lsb_release -rs)
+```
+If grml-zsh-config is installed, add a first line in ~/.zshrc
+```bash
+add-zsh-hook -d precmd prompt_grml_precmd
+```
+whenever you want to customize your prompt. (see https://www.reddit.com/r/archlinux/comments/50sfdq/unable_to_change_zsh_command_prompt/)
 
+### LXDM Display Manager (switched to lightdm)
+```bash
+pacman -S lxdm
+```
+I had trouble with the default keyboard in lxdm (the one of Xorg) and I needed to set the french azerty (with 'é'). For this I found some help on the internet.
 
-TIPS:
+https://wiki.gentoo.org/wiki/Keyboard_layout_switching
+https://forum.voidlinux.eu/t/change-default-keyboard-for-lxdm-to-local-layout/972
 
-for a xfce4 X session : ctr + alt + fX (with X in [1-6]) switch to a console tty.
-To come back to the xfce4 session : ctr + alt + f7 ! (ctr + alt + f1 won't work)
-openbox load AZERTY : setxkbmap fr oss
+An (ugly) solution is to create a /etc/X11/xorg.conf file with
 
-look at :
-i3 rofi w3m firefox ranger vim mutt mpd newsbeuter pass
+    Section "InputClass"
+    Identifier "system-keyboard"
+    MatchIsKeyboard "on"
+    Option "XkbLayout" "fr"
+    Option "XkbModel" "pc105"
+    Option "XkbVariant" "azerty"
+    Option "XkbRules" "evdev"
+    Option "XkbOptions" "terminate:ctrl_alt_bksp"
+    EndSection
 
+####Install a dark Arch linux theme for LXDM
+```bash
+pacaur -S lxdm-themes
+```
+List all available themes 
+```bash
+ls /usr/share/lxdm/themes
+vim /etc/lxdm/lxdm.conf
+```
+Change 
 
+    theme=Archlinux
 
+### Install pacaur (TODO: pacaur is dead, switch to trizen https://www.youtube.com/watch?v=Hx-8GFBtV6I)
+Switch to a user without sudo power (as soon as you install AUR packages)
+```bash
+cd /tmp
+git clone --depth=1 https://aur.archlinux.org/cower.git
+cd cower
+gpg --recv-keys --keyserver hkp://pgp.mit.edu 1EB2638FF56C0C53
+makpkg -sri
+cd ..
+git clone --depth=1 https://aur.archlinux.org/pacaur.git
+cd pacaur
+makepkg -sri
+```
 
+### Sublime (might be better to install "visual studio code" instead) 
+Sublime text editor (still with a non-sudo-user) 
+```bash
+trizen -S sublime-text
+```
 
-##Some cool stuffs
-visual studio code
-bash debug: bashdb (also a plugin for visual studio code)
-shellcheck (also a plugin pycharm)
+## Not working
+remarkable (reader of markdown files)
