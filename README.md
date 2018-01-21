@@ -407,6 +407,10 @@ Make zsh the default shell
 ```bash
 chsh -s /bin/zsh
 ```
+NB: Usually zsh is used in Emacs mode. If the vim mode was accidentally set, Emacs mode can be set back at any time with
+```bash
+bindkey -e
+```
 ### Install a Windows Display Manager
 ```bash
 lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings
