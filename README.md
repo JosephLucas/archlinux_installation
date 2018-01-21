@@ -1000,6 +1000,3 @@ Sublime text editor (still with a non-sudo-user)
 ```bash
 trizen -S sublime-text
 ```
-
-## Not working
-remarkable (reader of markdown files)
