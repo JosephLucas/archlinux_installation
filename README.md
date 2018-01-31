@@ -833,11 +833,28 @@ with :
 
 Setting Manager -> Keyboard -> Application Shortcuts and add the command "/usr/bin/xfce4-screenshooter"
 
-## Manager of archives : 
+### Manager of archives :
 (same as ubuntu's)
 ```bash
 pacman -S file-roller
 ```
+
+### Docker
+```bash
+pacman -S docker
+sudo systemctl enable docker.service
+```
+Add the user to the group
+```bash
+sudo gpasswd -a jlucas docker
+```
+
+### Download mp3 from youtube videos
+```bash
+pacman -S youtube-dl ffmpeg
+youtube-dl --extract-audio --audio-format mp3 <url>
+```
+For more, https://askubuntu.com/questions/178481/how-to-download-an-mp3-track-from-a-youtube-video
 ## Hints and unsuccessful tries
 
 ### Bluetooth pairing of the headset, Bose Quiet Confort q35
