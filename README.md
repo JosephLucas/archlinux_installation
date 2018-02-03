@@ -354,6 +354,7 @@ To come back to the xfce4 session
 
     ctr + alt + f7 
 (ctr + alt + f1 doesn't work for unknown reasons)
+
 ### Unmute sound 
 ```bash
 pacman -S alsa-utils
@@ -369,7 +370,8 @@ pacman -S xfce-pulseaudio-plugin
 pacman -S pavucontrol
 ```
 and might also need to restart.
-### Configure an automatical connection to the internet
+
+### Configure an automated connection to the internet
 ```bash
 ip link show
 ```
@@ -558,18 +560,17 @@ Set wallpaper : http://cinderwick.ca/files/archlinux/wallpaper/archlinux-xfce-az
 
 Remove some icons (specially important for avoiding drag-n-drop in root)
 
-Settings > Desktop > Icons > (uncheck 'FileSystem' and 'Removable Devices') 
+Settings > Desktop > Icons > (uncheck 'FileSystem' and 'Removable Devices')
 
 Install icons theme
 ```bash
 trizen -S humanity-icon-theme
-``` 
+```
 (the package `arc-icon-theme` is also a good choice)
 
 Settings > Appearance > Icons > Humanity
 
 ### Monitoring CPU,RAM,SWAP with conky
-
 ```bash
 pacman -S conky
 mkdir -p ~/.config/conky
@@ -598,51 +599,27 @@ mv conky.desktop ~/.config/autostart
 
 ### Plank dock (Macos like panel)
 ```bash
-trizen -S pacaur -S plank-theme-arc
+trizen -S plank-theme-arc
 ```
-Remove the anchor icon
-```bash
-gconftool-2 --type Boolean --set /apps/docky-2/Docky/Items/DockyItem/ShowDockyItem False
-``` 
-Solve icon of sublime the cannot be toggled to the dock (http://www.techbear.co/sublime-debian-plank/)
+Configure Plank
+1. Hold down Control and right click anywhere on the dock
+2. Select "Preferences"
 
-    sudo ln -s /opt/sublime_text/sublime_text /usr/bin/sublime
+#### Fix annoying shadow bar next to Plank dock
+Settings > Window Manager Tweaks > Compositor tab > untick the ‘Show shadows under dock windows’ checkbox
 
-    sublime /usr/share/applications/sublime-text.desktop
+### Configure xfce panel
+Settings > Panel > Add the "whisker menu" item and remove "Applications menu".
 
-    [Desktop Entry]
-    Type=Application
-    Name=Sublime Text Perso
-    Comment=Sophisticated text editor for code, html and prose
-    Exec=sublime %F
-    Icon=sublime-text
-    Categories=Utility;TextEditor;
-    Terminal=false
-    MimeType=text/plain;
-    StartupNotify=true
-    Actions=Window;Document;
+Fix trouble editing the account top-left xfce whisker menu
+ ```bash
+trizen -S mugshot
+ ```
 
-    [Desktop Action Window]
-    Name=New Window
-    Exec=sublime -n
-    OnlyShowIn=XFCE;
-    Icon=sublime-text
-     
-    [Desktop Action Document]
-    Name=New File
-    Exec=sublime --command new_file
-    OnlyShowIn=XFCE;
-    Icon=sublime-text
-    
-    
 ### Albert (fast launcher from keywords)
 ```bash
 trizen -S albert
 ```
-### Fix trouble editing the account top-left xfce window-like start-app 
- ```bash
-trizen -S mugshot
- ```
 ### Instant messagery with Pidgin
 ```bash
 pacman -S pidgin
@@ -832,10 +809,11 @@ with :
 	  Option "TearFree" "true"
 	EndSection 
 
-### xfce screenshooter shortcut keys
+### xfce keyboard shortcuts
 
-Setting Manager -> Keyboard -> Application Shortcuts and add the command "/usr/bin/xfce4-screenshooter"
+Setting Manager -> Keyboard -> Application Shortcuts and add the command "xfce4-screenshooter"
 
+Do the same for the consol "xfce4-terminal"
 ### Manager of archives :
 (same as ubuntu's)
 ```bash
@@ -859,6 +837,12 @@ youtube-dl --extract-audio --audio-format mp3 <url>
 ```
 For more, https://askubuntu.com/questions/178481/how-to-download-an-mp3-track-from-a-youtube-video
 ## Hints and unsuccessful tries
+
+### Improvement of Plank
+Remove the anchor icon
+```bash
+gconftool-2 --type Boolean --set /apps/docky-2/Docky/Items/DockyItem/ShowDockyItem False
+```
 
 ### Bluetooth pairing of the headset, Bose Quiet Confort q35
 NB: I didn't manage to enable bluetooth connection -> plug it with a jack wire
@@ -1020,3 +1004,33 @@ Sublime text editor (still with a non-sudo-user)
 ```bash
 trizen -S sublime-text
 ```
+
+Solve icon of sublime, with plank, cannot be toggled to the dock (http://www.techbear.co/sublime-debian-plank/)
+
+    sudo ln -s /opt/sublime_text/sublime_text /usr/bin/sublime
+
+    sublime /usr/share/applications/sublime-text.desktop
+
+    [Desktop Entry]
+    Type=Application
+    Name=Sublime Text Perso
+    Comment=Sophisticated text editor for code, html and prose
+    Exec=sublime %F
+    Icon=sublime-text
+    Categories=Utility;TextEditor;
+    Terminal=false
+    MimeType=text/plain;
+    StartupNotify=true
+    Actions=Window;Document;
+
+    [Desktop Action Window]
+    Name=New Window
+    Exec=sublime -n
+    OnlyShowIn=XFCE;
+    Icon=sublime-text
+
+    [Desktop Action Document]
+    Name=New File
+    Exec=sublime --command new_file
+    OnlyShowIn=XFCE;
+    Icon=sublime-text
