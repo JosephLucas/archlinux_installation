@@ -488,9 +488,9 @@ Check 'Automatically mount'
 
 ### Customize rEFInd
 Download asus logo http://logo-logos.com/wp-content/uploads/2016/10/Asus_logo_black_and_white.png
-Edit the asus logo with gimp `pacman -S gimp imagemagick` to shrink it to 800 in width and 24 color bit depth.
+Shrink Asus logo to 800px in width and 24bits depth for colors.
 ```bash
-convert -colors 256 -depth 24 +dither ~/Desktop/logo_asus.png ~/Desktop/logo_asus_24b.png
+convert -colors 256 -depth 24 +dither -resize 800 ~/Desktop/logo_asus.png ~/Desktop/logo_asus_24b.png
 ```
 Download snowy icons (https://sourceforge.net/projects/refind/files/themes/)
 ```bash
@@ -661,6 +661,11 @@ https://www.reddit.com/r/linux_gaming/comments/6ftq10/the_ultimate_guide_to_sett
 1) install bumblebee
 
 https://wiki.archlinux.org/index.php/Bumblebee#Installing_Bumblebee_with_Intel.2FNVIDIA
+Ensure you have enabled "multilib" repository: be sure both lines are uncommented in `/etc/pacman.conf`
+
+    [multilib]
+    Include = /etc/pacman.d/mirrorlist
+
 ```bash
 pacman -S bumblebee mesa nvidia lib32-virtualgl lib32-nvidia-utils
 ```
@@ -684,24 +689,26 @@ optirun glxspheres32
 ```bash
 trizen -S nvidia-xrun
 pacman -S openbox
-sudo pacman -S openbox
 ```
-In ~/.nvidia-xinitrc, add the lines
-
-    # start the window manager
-    openbox-session
+In `~/.nvidia-xinitrc`, add a line that starts `openbox-session`
+```bash
+echo -e '# start the window manager\nopenbox-session' >> ~/.nvidia-xinitrc
+```
 
 Configure Openbox (https://wiki.archlinux.org/index.php/openbox#Configuration)
 ```bash
 cp -R /etc/xdg/openbox ~/.config/
 ```
-In ~/.config/openbox/autostart, add the lines
+In `~/.config/openbox/autostart`, ensure that keyboard is properly set to AZERTY
 
     # personal config (jlucas)
     #
     # change  keyboard to fr-latin1 (azerty)
     (sleep 2s && setxkbmap fr-latin1 oss) &
-    
+```bash
+echo '\n# personal config (jlucas)\n#\n# change  keyboard to fr-latin1 (azerty)\n(sleep 2s && setxkbmap fr-latin1 oss) &' >> ~/.config/openbox/autostart
+```
+
 Next lines describe how to Activate the Geforce gt 620 M in openbox.
 
 Logout from the xfce4 DE
@@ -739,27 +746,28 @@ nvidia-settings -q screens -q gpus -q framelocks -q fans -q thermalsensors
 (terse option, add : -t)
 
 ### Wine (allow executing some windows applications natively)
-wine-staging the dev branch of wine, but with impressive improvements !
+Here also, ensure you have enabled pacman "multilib" repository.
+
 ```bash
-sudo pacman -S wine-staging
-``` 
+sudo pacman -S wine
+```
+(use default providers if you are asked for a choice)
+
 For sound 
 ```bash
-sudo pacman -Qs lib32-libpulse
+pacman -S lib32-libpulse
 ```
-(It might be interesting to look also at the package 'wine-staging-nine' for improvements of DirectX9 games with gallium patches.)
 
 Configure wine
 ```bash
 wine winecfg
-``` 
+```
+Do install .NET and Gecko in graphical popups
 ```bash
 wine control
 ```
 
-For Battlenet : https://wiki.archlinux.org/index.php/Blizzard_App
-
-Install
+For Battlenet, install
 ```bash
 pacman -S winetricks lib32-gnutls lib32-libldap
 winetricks corefonts
@@ -774,7 +782,7 @@ pacman -S vlc qt4 libcdio
 ```
 ### Nextcloud (fork of Owncloud)
 ```bash
-pacman -S nextcloud-client libgnome-keyring
+pacman -S nextcloud libgnome-keyring
 ```
 libgnome-keyring is necessary to store the password
 
