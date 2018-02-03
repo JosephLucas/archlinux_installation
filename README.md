@@ -419,6 +419,17 @@ bindkey -e
 lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings
 systemctl enable lightdm
 ```
+
+Set a background for all users
+```bash
+sudo cp /home/jlucas/Images/xxx.png /home/
+```
+Give permission rights to the image for the background of LightDM
+```bash
+sudo chmod uog+rwx /home/xxx.png
+```
+Settings > LightDM + Greeter > background image
+
 ### Switch xfce4 and lightdm into azerty
 ```bash
 localctl --no-convert set-x11-keymap fr
@@ -463,7 +474,7 @@ In  Applications > Setting > Mouse and Touchpad, set tap click and scrolling.
 pacman -S udisks2 
 pacman -S thunar-volman gvfs
 ```
-Maybe an easier solution (not tested)
+
 In Thunar (default folder/files manager of xfce4)
     Edit -> Preferences
     Tab « Advanced » on the right
@@ -549,54 +560,40 @@ Remove some icons (specially important for avoiding drag-n-drop in root)
 
 Settings > Desktop > Icons > (uncheck 'FileSystem' and 'Removable Devices') 
 
-Install icons
+Install icons theme
 ```bash
-pacman -S arc-icon-theme
+trizen -S humanity-icon-theme
 ``` 
+(the package `arc-icon-theme` is also a good choice)
 
-Settings > Appearance > Icons > Arc
+Settings > Appearance > Icons > Humanity
 
 ### Monitoring CPU,RAM,SWAP with conky
 
 ```bash
 pacman -S conky
 mkdir -p ~/.config/conky
+```
+Default configuration
+```bash
 conky -C > ~/.config/conky/conky.conf
 ```
-Add in the config file
 
-    background = true,
+Download versioned configuration file
+```bash
+wget https://raw.githubusercontent.com/JosephLucas/configs/master/.config/conky/conky.conf
+cp ~/.config/conky/conky.conf{,.bak}
+mv conky.conf ~/.config/conky/conky.conf
+```
 
-Add a `~/.config/autostart/conky.desktop`:
+Enable conky to auto-start
+```bash
+wget https://raw.githubusercontent.com/JosephLucas/configs/master/.config/autostart/conky.desktop
+mkdir -p ~/.config/autostart
+mv conky.desktop ~/.config/autostart
+```
 
-    [Desktop Entry]
-    Encoding=UTF-8
-    Version=0.9.4
-    Type=Application
-    Name=conky
-    Comment=
-    Exec=conky -d -p 10
-    StartupNotify=false
-    Terminal=false
-    Hidden=false
-    OnlyShowIn=XFCE;
-
-Add transparency
-
-    last post of angstrom (https://forum.xfce.org/viewtopic.php?id=6847)
-
-    alignment = 'bottom_right',
-
-    double_buffer = true,
-    format_human_readable = true,
-
-    own_window = true,
-    own_window_class = 'Conky',
-    own_window_type = 'override',
-    own_window_argb_visual = false,
-    own_window_argb_value = 0,
-    own_window_transparent = true,
-
+(inspiration: last post of angstrom https://forum.xfce.org/viewtopic.php?id=6847)
 (documentation http://conky.sourceforge.net/config_settings.html)
 
 ### Plank dock (Macos like panel)
