@@ -317,7 +317,7 @@ After a reboot, check that microcode is 'updated early'
 dmesg | grep microcode
 ```
 ### Activate TRIM (for saving your an SSD lifetime)
-Following https://wiki.archlinux.org/index.php/Solid_Statea_Drives#Maximizing_performance
+Following https://wiki.archlinux.org/index.php/Solid_State_Drives#Maximizing_performance
 
 Check if you have a ssd disk with a TRIM available 
 ```bash
@@ -332,7 +332,7 @@ systemctl enable fstrim.timer
 ### Optimize SSD
 From https://wiki.archlinux.fr/SSD#Option_de_montage_noatime
 
-Add option **noatime** in /etc/fstab for partitions on the ssd. ()
+Add option **noatime** in /etc/fstab for partitions on the ssd. (It should already be the case by default)
 
 ### Desktop environment xfce4
 Start the graphical window manager
@@ -343,9 +343,9 @@ startxfce4
 ```bash
 pacman -S xfce4-goodies
 ```
-Change icon `/usr/share/icons/hicolor/48x48/apps/xfce4-time-out-plugin.png` because it graphically ressemble the clock icon.
+Change icon `/usr/share/icons/hicolor/48x48/apps/xfce4-time-out-plugin.png` because it graphically looks like the clock icon.
 
-Within a xfce4 grpahical session switch to a consol tty
+Within a xfce4 graphical session switch to a consol tty
 
     ctr + alt + fX 
 (with X in [1-6])
@@ -432,14 +432,13 @@ mkswap /swapfile
 swapon /swapfile
 ```
 edit `/etc/fstab` to add an entry for the swap file:
-
-    /swapfile	none	swap	defaults	0 0
+echo '/swapfile	none	swap	defaults	0 0' | sudo tee -a /etc/fstab
 
 Then
 ```bash 
 pacman -S systemd-swap
 ```
-set `swapfu_enabled=1` in the Swap File Universal section of `/etc/systemd/swap.conf`
+set `swapfc_enabled=1` in the Swap File Universal section of `/etc/systemd/swap.conf`
 ```bash 
 systemctl enable systemd-swap.service
 ```
@@ -484,12 +483,16 @@ Download snowy icons (https://sourceforge.net/projects/refind/files/themes/)
 ```bash
 pacman zip unzip
 ```
-Move the logo and the snowy folder in /boot/EFI/refind/themes (`mkdir /boot/EFI/refind/themes`)
+Move the logo and the snowy folder in /boot/EFI/refind/themes (`mkdir /boot/efi/EFI/refind/themes`)
+```bash
+echo 'banner /EFI/refind/themes/logo_asus_24b.png' | sudo tee -a /boot/efi/EFI/refind/refind.conf
+```
 
-at the end of `/boot/EFI/refind/refind.conf` write
+#### If you want to discard automated detection of efi boot loaders
+
+At the end of `/boot/efi/EFI/refind/refind.conf` write
 
     # Personal config
-    banner /EFI/refind/themes/logo_asus_24b.png
     menuentry "Arch Linux" {
         icon     /EFI/refind/themes/snowy/os_arch.png
         volume   /EFI
