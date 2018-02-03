@@ -310,9 +310,12 @@ If you need microcode,
 pacman -S intel-ucode
 vim /boot/refind_linux.conf
 ```
-and add the line
-`'initrd=/boot/intel-ucode.img initrd=/boot/initramfs-linux.img'`
+and insert `initrd=/boot/intel-ucode.img` just before `initrd=/boot/initramfs-linux.img`, with spaces between options.
 
+After a reboot, check that microcode is 'updated early'
+```bash
+dmesg | grep microcode
+```
 ### Activate TRIM (for saving your an SSD lifetime)
 Following https://wiki.archlinux.org/index.php/Solid_Statea_Drives#Maximizing_performance
 
