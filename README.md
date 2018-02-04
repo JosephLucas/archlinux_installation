@@ -767,11 +767,17 @@ Do install .NET and Gecko in graphical popups
 wine control
 ```
 
-For Battlenet, install
+### Install Battlenet client
 ```bash
 pacman -S winetricks lib32-gnutls lib32-libldap
 winetricks corefonts
 ```
+### Fix Blackscreen and error when starting Heroes Of The Storm
+https://eu.battle.net/forums/en/heroes/topic/17612391410
+
+Before starting the game (from battlenet client app)
+Game settings > additional command line arguments > "-dx9"
+
 ### Htop
 ```bash
 pacman -S htop
@@ -789,6 +795,11 @@ libgnome-keyring is necessary to store the password
 ### Pdf viewer
 ```bash
 trizen -S acroread
+```
+
+### Handle archive formats
+```bash
+pacman -S p7zip p7zip-plugins unrar tar rsync
 ```
 
 ### Fix screen tearing issues with the default window compositor of xfce4
@@ -917,22 +928,22 @@ Shift colors depending on the hour of the day (help your eyes hurt less if you a
 `redshift`
 
 It might be interesting to have a look at 
-    
-    i3 rofi w3m ranger mutt mpd newsbeuter pass
+
+    aria2: a lightweight multi-protocol & multi-source command-line download utility
+    uget: a download manager which can use aria2 as a back-end by enabling a built-in plugin
 and 
     
     visual studio code
     bash debug: bashdb (also a plugin for visual studio code)
     shellcheck (also a plugin pycharm)
-
 ## TODO
 Wayland (emulate Xserver with xWayland)
-installation process for docker and virtualbox
-activates HOOKS requested for kvm et docker
+installation process for virtualbox
+activates HOOKS requested for kvm
 use Wayland or XWayland as soon as XFCE allows it
 
 ## Tips
-Use TestDisk or parted in rescue mod to rescue erroneous partion tables
+Use TestDisk or parted in rescue mod to rescue erroneous partition tables
 
 ## Glossary
 Arch linux Rollback Machine (ARM)
@@ -993,21 +1004,7 @@ Change
 
     theme=Archlinux
 
-### Install pacaur (TODO: pacaur is dead, switch to trizen https://www.youtube.com/watch?v=Hx-8GFBtV6I)
-Switch to a user without sudo power (as soon as you install AUR packages)
-```bash
-cd /tmp
-git clone --depth=1 https://aur.archlinux.org/cower.git
-cd cower
-gpg --recv-keys --keyserver hkp://pgp.mit.edu 1EB2638FF56C0C53
-makpkg -sri
-cd ..
-git clone --depth=1 https://aur.archlinux.org/pacaur.git
-cd pacaur
-makepkg -sri
-```
-
-### Sublime (might be better to install "visual studio code" instead) 
+### Sublime (might be better to install "visual studio code" instead)
 Sublime text editor (still with a non-sudo-user) 
 ```bash
 trizen -S sublime-text
