@@ -100,7 +100,7 @@ To see what access points are available
 ```
 Connect to an access point
 * No encryption
-    ```bash    
+    ```bash
     iw dev interface connect "your_essid"
     ```
 * WEP
@@ -643,8 +643,12 @@ trizen -S pidgin-extprefs
 ```
 Have a look at https://github.com/JD342/arc-thunderbird-integration
 
+### Download interfaces
+```bash
+pacman -S wget rsync aria2 uget
+```
+
 ### Mail client : neomutt
-NB: need wget : `pacman -S wget`
 see https://www.neomutt.org/distro/arch
 ```bash
 mkdir -p /tmp/makepkg && cd /tmp/makepkg
@@ -779,7 +783,7 @@ wine control
 pacman -S winetricks lib32-gnutls lib32-libldap
 winetricks corefonts
 ```
-### Fix Blackscreen and error when starting Heroes Of The Storm
+### Fix blackscreen and error when starting Heroes Of The Storm
 https://eu.battle.net/forums/en/heroes/topic/17612391410
 
 Before starting the game (from battlenet client app)
@@ -806,7 +810,7 @@ trizen -S acroread
 
 ### Handle archive formats
 ```bash
-pacman -S p7zip p7zip-plugins unrar tar rsync
+pacman -S p7zip p7zip-plugins tar
 ```
 
 ### Fix screen tearing issues with the default window compositor of xfce4
@@ -862,6 +866,10 @@ pacman -S youtube-dl ffmpeg
 youtube-dl --extract-audio --audio-format mp3 <url>
 ```
 For more, https://askubuntu.com/questions/178481/how-to-download-an-mp3-track-from-a-youtube-video
+
+### Other packages
+`xkill`
+
 ## Hints and unsuccessful tries
 
 ### Improvement of Plank
@@ -934,6 +942,14 @@ Analyse Disk usage
 Shift colors depending on the hour of the day (help your eyes hurt less if you are working in front of the screen at night)
 `redshift`
 
+(from http://sametmax.com/mon-environnement-de-travail/)
+Agregator of RS feeds (have a look at "Tiny RSS" too)
+`liferea`
+Snapshot with integrated util to edit (avoid openning gimp a posteriori)
+`shutter`
+Editing pdfs
+`pdfmod`
+
 It might be interesting to have a look at 
 
     aria2: a lightweight multi-protocol & multi-source command-line download utility
@@ -942,7 +958,7 @@ and
     
     visual studio code
     bash debug: bashdb (also a plugin for visual studio code)
-    shellcheck (also a plugin pycharm)
+    shellcheck (also a pycharm plugin)
 ## TODO
 Wayland (emulate Xserver with xWayland)
 installation process for virtualbox
@@ -1046,3 +1062,4 @@ Solve icon of sublime, with plank, cannot be toggled to the dock (http://www.tec
     Exec=sublime --command new_file
     OnlyShowIn=XFCE;
     Icon=sublime-text
+
