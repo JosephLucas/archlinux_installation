@@ -528,6 +528,13 @@ cd trizen-git
 makepkg -si
 cd -
 ```
+### Ethernet (usb ASIX Electronics Corp. AX88179 Gigabit Ethernet)
+Intall driver from AUR and dependency (linux-headers for the kernel
+module of the driver)
+```bash
+pacman -S linux-headers
+trizen -s asix-ax88179-dkms
+```
 ### Pycharm
 IDE python : pychamr
 ```bash
