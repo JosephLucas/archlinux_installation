@@ -816,6 +816,13 @@ wine control
 pacman -S winetricks lib32-gnutls lib32-libldap
 winetricks corefonts
 ```
+### Fix the icon of wine in the menu
+```bash
+for f in ~/.local/share/icons/hicolor/*/apps/1CD8_rundll32.0.png; do cp $f $(dirname $f)/wine.png; done
+```
+with ~/.local/share/icons/hicolor/*/apps/1CD8_rundll32.0.png convenient icons of wine for different sizes (*)
+
+To update the icon cache, log out and in.
 ### Fix blackscreen and error when starting Heroes Of The Storm
 https://eu.battle.net/forums/en/heroes/topic/17612391410
 
