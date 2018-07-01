@@ -1,0 +1,41 @@
+# https://wiki.archlinux.org/index.php/Rsync#Full_system_backup
+#
+# "The contents of /dev, /proc, /sys, /tmp, and /run are excluded
+# because they are populated at boot, although the folders themselves
+# are not created. /lost+found is filesystem-specific."
+/dev/*
+/proc/*
+/sys/*
+/tmp/*
+/run/*
+/mnt/*
+/media/*
+/lost+found
+
+/swapfile
+# RAM
+/run/user/1000/*
+
+# in /home/
+/home/*/.thumbnails/*
+/home/*/.cache/mozilla/*
+/home/*/.local/share/Trash/*
+
+# https://wiki.archlinux.org/index.php/Rsync#Full_system_backup
+# "If GVFS is installed, /home/*/.gvfs must be excluded to prevent rsync errors."
+/home/*/.gvfs
+
+# https://unix.stackexchange.com/a/162911
+/run/user/1000/*
+
+## If you do not care of having a functional system in the backup
+## but just want personal data, you can also exclude
+# /var/*
+# /usr/*
+## misc
+# *.bak
+# log
+## package manager data
+# /nix/*
+## apps cache
+# /home/*/.cache/*

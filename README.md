@@ -1,3 +1,51 @@
+## Backup any data
+
+### Backup a linux OS
+(https://wiki.archlinux.org/index.php/Rsync#Full_system_backup)
+
+Download a list of ignored folders and files
+```bash
+wget https://raw.githubusercontent.com/JosephLucas/archlinux_installation/master/ignored_during_backup
+```
+
+Start with a dry run with the option `--dry-run` to see what rsync plans to do.
+```bash
+rsync --dry-run -av --delete --stats --info=progress2 --exclude={"/path/to/backup/folder/*"} --exclude-from=ignored_during_backup / /path/to/backup/folder
+```
+
+NB: this will do backup the /boot, /etc and /home
+
+
+### Backup home
+
+### Backup a former windows partition
+Tools to list disks on the machine
+```bash
+lsblk
+lsblk -f
+lsblk -o NAME,SIZE,FSTYPE,MOUNTPOINT,LABEL,PARTLABEL
+lskid
+```
+*ntfsresize* can resize windows partition (shrink or extend) without any previous defragmentation.
+*ntfsclone* copies ntfs partitions fast.
+
+Get how much space is *really* used before resizing the partition
+```bash
+ntfsresize --info
+```
+If exception is raised, like:
+
+    disk has been scheduled for *chkdsk*
+you may need to relaunch windows.
+This will launch the *chkdsk* tool to repare some errors in the *ntfs* partition.
+
+Finally, edit the ntfs partition, for instance
+```bash
+ntfsresize -s -o /mnt/depot_jo/Backup/windows.sepcial.img /dev/sdX
+ntfsresize --no-action --size 100G /dev/sdaX
+ntfsresize -v --size 100G /dev/sdaX
+```
+
 
 # Installation of Arch Linux
 The installation process is for UEFI computers, we do not cover BIOS installation process. 
@@ -16,7 +64,6 @@ Main inspirations:
     https://wiki.archlinux.org/index.php/General_recommendations
     https://wiki.archlinux.fr/installation
     https://wiki.archlinux.org/index.php/ASUS_Zenbook_Prime_UX31A
-
 
 ## Download the last iso of Arch Linux
 Use a mirror listed at https://www.archlinux.org/download/
@@ -125,34 +172,6 @@ pacman -Syy
 set timezone (it seems needed for pacman)
 ```bash
 timedatectl set-timezone Europe/Paris
-```
-
-### Backup a former windows partition
-Tools to list disks on the machine
-```bash
-lsblk 
-lsblk -f
-lsblk -o NAME,SIZE,FSTYPE,MOUNTPOINT,LABEL,PARTLABEL
-lskid
-```
-*ntfsresize* can resize windows partition (shrink or extend) without any previous defragmentation. 
-*ntfsclone* copies ntfs partitions fast.
-
-Get how much space is *really* used before resizing the partition
-```bash
-ntfsresize --info
-```
-If exception is raised, like:
-
-    disk has been scheduled for *chkdsk* 
-you may need to relaunch windows. 
-This will launch the *chkdsk* tool to repare some errors in the *ntfs* partition.
-
-Finally, edit the ntfs partition, for instance
-```bash
-ntfsresize -s -o /mnt/depot_jo/Backup/windows.sepcial.img /dev/sdX
-ntfsresize --no-action --size 100G /dev/sdaX
-ntfsresize -v --size 100G /dev/sdaX
 ```
 
 ### Edit partitions
@@ -481,6 +500,11 @@ In Thunar (default folder/files manager of xfce4)
     Edit -> Preferences
     Tab « Advanced » on the right
     Check « activate device manager »
+
+If you want to be able to write on a mounted ntfs disk:
+```bash
+pacman -S ntfs-3g
+```
 
 ### Removable drives and media
 Applications > Settings > Appearance > Removable drives and media
