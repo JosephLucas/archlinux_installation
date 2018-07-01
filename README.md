@@ -559,6 +559,12 @@ module of the driver)
 pacman -S linux-headers
 trizen -s asix-ax88179-dkms
 ```
+Configure netctl
+```bash
+cp /etc/netctl/examples/ethernet-dhcp /etc/netctl/
+netctl start ethernet-dhcp
+netctl enable ethernet-dhcp
+```
 ### Pycharm
 IDE python : pychamr
 ```bash
@@ -603,7 +609,10 @@ Settings > Appearance > Icons > Humanity
 
 ### Monitoring CPU,RAM,SWAP with conky
 ```bash
-pacman -S conky
+pacman -S conky pacman-contrib
+```
+(pacman-contrib gives the command checkupdates used to show the number of updates available)
+```bash
 mkdir -p ~/.config/conky
 ```
 Default configuration
