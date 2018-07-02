@@ -206,9 +206,11 @@ If you plan to resize some logival volumes, do not forget to:
 * shrink the file system **before** shrinking the logical volume
 * extend the logical volume **before** extending the file system)
 
-Contrary to the standard mountpoint of the ESP (cf http://www.rodsbooks.com/refind/installing.html) we mount the ESP at /boot. rEFInd doesn't seem to read LVM partitions and Arch install bootimages into /boot with pacstrap and mkinitcpio.
-
-Another solution would be to move the images and the refind_linux.conf from /boot/ (into LVM/ext4) to /boot/efi (into the ESP) each time they are upgraded :
+If LVM partitions are used, the ESP is mounted at /boot; contrary to the standard mountpoint of the ESP.
+(cf http://www.rodsbooks.com/refind/installing.html). Cause, rEFInd doesn't seem to read LVM partitions whereas Arch
+installs bootloader and iniramfs into /boot with pacstrap and mkinitcpio.
+Another solution would be to move the images and the refind_linux.conf from /boot/ (into LVM/ext4) to /boot/efi
+(into the ESP) each time they are upgraded :
 
     do not launch ! (mv) /boot/initramfs-linux.img /boot/initramfs-linux-fallback.img /boot/refind_linux.conf /boot/vmlinuz-linux /boot/refind_linux.conf /boot/efi
 
@@ -529,13 +531,14 @@ echo 'banner /EFI/refind/themes/logo_asus_24b.png' | sudo tee -a /boot/efi/EFI/r
 
 At the end of `/boot/efi/EFI/refind/refind.conf` write
 
-    # Personal config
+    # Personal config, using the partition label for the volume
     menuentry "Arch Linux" {
-        icon     /EFI/refind/themes/snowy/os_arch.png
-        volume   /EFI
-        loader   vmlinuz-linux
-        initrd   initramfs-linux.img
-        options  "ro root=/dev/mapper/vg_ssd-lv_root add_efi_memmap loglevel=3"
+        volume   "arch_root"
+        icon     /boot/efi/EFI/refind/icons/os_arch.png
+        loader   /boot/vmlinuz-linux
+        initrd   /boot/initramfs-linux.img
+        options  "ro root=/dev/sdb2 add_efi_memmap loglevel=3"
+        ostype   "Linux"
         submenuentry "Boot using fallback initramfs" {
             initrd initramfs-linux-fallback.img
         }
@@ -599,11 +602,11 @@ Remove some icons (specially important for avoiding drag-n-drop in root)
 
 Settings > Desktop > Icons > (uncheck 'FileSystem' and 'Removable Devices')
 
-Install icons theme
+Install icon themes
 ```bash
 trizen -S humanity-icon-theme
 ```
-(the package `arc-icon-theme` is also a good choice)
+(`papirus-icon-theme` and `arc-icon-theme` are also good choices)
 
 Settings > Appearance > Icons > Humanity
 
