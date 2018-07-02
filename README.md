@@ -403,10 +403,22 @@ Automatically connect to the wifi (https://wiki.archlinux.fr/Netctl#Connexion_au
 pacman -S wpa_actiond
 systemctl enable netctl-auto@wlp3s0.service
 ```
-Automatic ethernet connection
+Automatically switch wifi network connection
 ```bash
-systemctl enable netctl-auto@lo.service
+systemctl enable netctl-auto@<wifi-interface>.service
 ```
+Get the ethernet interface with
+```bash
+ip link
+```
+Then, to enable auto-connection when the ethernet cable is plugged in/unplugged
+(https://wiki.archlinux.org/index.php/netctl#Usage)
+```bash
+sudo pacman -S ifplugd
+sudo systemctl start netctl-ifplugd@<ethernet-interface>.service
+sudo systemctl enable netctl-ifplugd@<ethernet-interface>.service
+```
+(it might be useful to `rm /var/lib/dhcpcd/*.lease`)
 ### Create a non-root user
 with default shell = ZSH
 ```bash
