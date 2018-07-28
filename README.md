@@ -671,6 +671,23 @@ Fix trouble editing the account top-left xfce whisker menu
 trizen -S mugshot
  ```
 
+###Low battery warning
+First tried to set a systemd/timer for notify-send but (https://stackoverflow.com/a/49617812) advised not to do that.
+Finally opted for 1) of (https://bbs.archlinux.org/viewtopic.php?id=189307)
+
+Install a tool to monitor battery (https://unix.stackexchange.com/a/60936)
+```bash
+pacman -S acpi
+```
+
+Download and install daemon script
+(https://wiki.archlinux.org/index.php/Systemd/Timers)
+```bash
+wget https://raw.githubusercontent.com/JosephLucas/archlinux_installation/master/low_battery_warning.sh
+sudo install -o root -g root -m 755 low_battery_warning.sh /usr/local/bin
+rm low_battery_warning.sh
+```
+
 ### Albert (fast launcher from keywords)
 ```bash
 trizen -S albert
