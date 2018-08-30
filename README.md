@@ -77,7 +77,7 @@ mkfs.vfat -n <name_for_your_pendrive> -I /dev/sdc
 ```
 With sdX the USB stick device
 ```bash
-dd bs=4M if=arch.iso of=/dev/sdX
+dd bs=4M if=arch.iso of=/dev/sdX status=progress
 ``` 
 
 ## Boot from the USB stick in EFI mod
