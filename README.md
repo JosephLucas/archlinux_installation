@@ -869,6 +869,13 @@ pacman -S htop
 ```bash
 pacman -S vlc qt4 libcdio
 ```
+### Mount an Android smartphone device via USB
+Activate the MTP protocol on the smartphone, then
+```bash
+pacman -S jmtpfs
+mkdir /mnt/smartphone
+jmtpfs /mnt/smartphone
+```
 ### Nextcloud (fork of Owncloud)
 ```bash
 pacman -S nextcloud libgnome-keyring
