@@ -996,6 +996,9 @@ For more, https://askubuntu.com/questions/178481/how-to-download-an-mp3-track-fr
 
 ## Hints and unsuccessful tries
 
+### Thunar right click action "set as wallpaper" on a picture isn't working
+https://forum.xfce.org/viewtopic.php?id=12322
+
 ### Improvement of Plank
 Remove the anchor icon
 ```bash
