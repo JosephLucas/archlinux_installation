@@ -678,6 +678,10 @@ Configure Plank
 #### Fix annoying shadow bar next to Plank dock
 Settings > Window Manager Tweaks > Compositor tab > untick the ‘Show shadows under dock windows’ checkbox
 
+### xfce shortcuts
+To open the *whisker menu* of the panel with the `windows` key, go to Settings -> Keyboard -> Application Shortcuts.
+Add the command `xfce4-popup-whiskermenu` in the list.
+
 ### Configure xfce panel
 Settings > Panel > Add the "whisker menu" item and remove "Applications menu".
 
