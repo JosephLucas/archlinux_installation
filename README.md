@@ -392,6 +392,16 @@ pacman -S pavucontrol
 ```
 and might also need to restart.
 
+If pulseaudio cannot start (e.g. by trying the command `pulseaudio`), and if it raises
+```
+E: [pulseaudio] core-util.c: Home directory not accessible: Permission denied
+```
+Then
+```
+sudo chown -R $USER:$USER $HOME
+```
+(NB: pulseaudio should not be started as a sudo)
+
 ### Configure an automated connection to the internet
 ```bash
 ip link show
