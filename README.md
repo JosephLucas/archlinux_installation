@@ -400,6 +400,11 @@ Then
 ```
 sudo chown -R $USER:$USER $HOME
 ```
+Start and enable the *user* daemon
+```
+systemctl --user restart pulseaudio.service
+systemctl --user enable pulseaudio.service
+```
 (NB: pulseaudio should not be started as a sudo)
 
 ### Configure an automated connection to the internet
