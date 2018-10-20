@@ -865,6 +865,36 @@ Game settings > additional command line arguments > "-dx9"
 ```bash
 pacman -S htop
 ```
+
+### SSH
+Install ssh
+```
+sudo pacman -S openssh
+```
+Start a ssh server
+```
+sudo systemctl start sshd
+```
+Gnerate ssh key pairs
+```
+ssh-keygen
+```
+Copy public key to .ssh/authorized_keys of a desired ssh server
+```
+ssh-copy-id <remote-user>@<host>
+```
+Edit .ssh/config
+```
+Host raspberry
+    HostName 192.168.10.1
+    Port 22
+    User pi
+```
+To avoid writing id_rsa passphrase for each connection
+```
+ssh-add
+```
+(NB: this presuposes that `ssh-agent` is already running)
 ### VLC
 ```bash
 pacman -S vlc qt4 libcdio
