@@ -303,12 +303,54 @@ mkinitcpio -p linux
 ```
 ### Install the boot loader rEFInd 
 Here we use rEFInd.
+
+By default, rEFInd scans all disks and locates all EFI bootloaders that can be launched with the UEFI.
+An easy way to configure a linux bootloader is to add a `refind_linux.conf` next to it, e.g.
+A more exhaustive configuration can be made through a manual "stanza" in `/boot/efi/EFI/refind/refind.conf`
+
+Let's install rEFInd
 ```bash
 pacman -S refind-efi
 refind-install
+```
+`refind-install` automatically generates the `refind_linux.conf` next to the linux image.
+It can be edited with
+```
 vim /boot/refind_linux.conf
 ```
 You might need to remove the 2 first lines that may correspond to the Arch Linux Live USB.
+
+Otherwise, edit the arch linux stanza in `/boot/efi/EFI/refind/refind.conf` to get
+```
+menuentry "Arch Linux" {
+    icon     EFI/refind/icons/os_arch.png
+    volume   arch_root
+    loader   /boot/vmlinuz-linux
+    initrd   /boot/initramfs-linux.img
+    options  "ro root=UUID=57203de9-12fc-419c-a358-7b880da80e38"
+    ostype   "Linux"
+    submenuentry "Boot using fallback initrd" {
+		initrd /boot/initramfs-linux-fallback.img
+	}
+}
+```
+where
+* "EFI/refind/icons/os_arch.png" is the path from the root of the ESP disk to the icon file
+* "arch_root" is the disk label. (this line corresponds to change the working directory)
+* "/boot/vmlinuz-linux" is the path to the linux kernel (on the "arch_root" volume)
+* "/boot/initramfs-linux.img" is the path to the linux initialisation RAM file system image
+The UUID of the linux OS disk (UUID=57203de9-12fc-419c-a358-7b880da80e38) can be found with `lsblk -f`.
+
+NB: The "fallback" image utilizes the same configuration file as the default image, except the autodetect hook is skipped
+during creation, thus including a full range of modules. The autodetect hook detects required modules and tailors the
+image for specific hardware, shrinking the initramfs.
+
+#### tricks with rEFInd
+
+On the rEFInd boot screen:
+* press F10 to make screenshots. Images are saved at the main dir of refind "ESP/refind/".
+* on a bootloader entrypoint press DEL to hide an entry. You cann restore it with the "configuration of hidden tags" icon afterwards.
+
 ### Set a password for the root
 ```bash
 passwd
