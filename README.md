@@ -577,6 +577,22 @@ If you want to be able to write on a mounted ntfs disk:
 pacman -S ntfs-3g
 ```
 
+### customize Thunar
+Remove the buggy "set as default wallpaper" when right click on an image
+```
+sudo mv /usr/lib/thunarx-3/thunar-wallpaper-plugin.so{,.disabled}
+```
+
+#### Add custom actions, when right click on a file/folder
+Add a custom action Edit->Configure custom actions...
+
+Have a look at https://docs.xfce.org/xfce/thunar/custom-actions
+
+(trick: to monitor/debug a xfce channel
+```
+xfconf-query -c xfce4-desktop -m
+```)
+
 ### Removable drives and media
 Applications > Settings > Appearance > Removable drives and media
 Check 'Automatically mount' 
