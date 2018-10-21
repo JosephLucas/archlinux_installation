@@ -1042,6 +1042,9 @@ For more, https://askubuntu.com/questions/178481/how-to-download-an-mp3-track-fr
 
 ## Hints and unsuccessful tries
 
+https://forum.owncloud.org/viewtopic.php?t=29048
+Non automatic login of owncloud-client at startup
+
 ### Thunar right click action "set as wallpaper" on a picture isn't working
 https://forum.xfce.org/viewtopic.php?id=12322
 
