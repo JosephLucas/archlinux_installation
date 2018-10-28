@@ -1035,6 +1035,17 @@ Do the same for the consol "xfce4-terminal"
 ```bash
 pacman -S file-roller
 ```
+### Redhift
+Shift colors depending on the hour of the day (help your eyes hurt less if you are working in front of the screen at night)
+`redshift`
+
+[In order to allow access Redshift to use GeoClue2, add the following lines to /etc/geoclue/geoclue.conf](https://wiki.archlinux.org/index.php/redshift#Configuration):
+```
+[redshift]
+allowed=true
+system=false
+users=
+```
 
 ### Docker
 ```bash
@@ -1131,8 +1142,6 @@ Edit pdfs
 `masterpdfeditor`
 Analyse Disk usage
 `baobab`
-Shift colors depending on the hour of the day (help your eyes hurt less if you are working in front of the screen at night)
-`redshift`
 
 (from http://sametmax.com/mon-environnement-de-travail/)
 Agregator of RS feeds (have a look at "Tiny RSS" too)
