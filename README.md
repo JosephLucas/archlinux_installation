@@ -1057,6 +1057,27 @@ Add the user to the group
 sudo gpasswd -a jlucas docker
 ```
 
+### Install proprietary software [Antidote](https://www.antidote.info/en)
+With the installer version over ./Antidote_9.5.3_B_31_Linux.bash things should go smoothly.
+Do remind to install firefox/thunderbird extensions.
+Do not read what goes next if things went smoothly.
+
+Otherwise have a look to the [reddit post](https://www.reddit.com/r/archlinux/comments/95z60b/antidote_freeze_anyone/e83aj0c/?context=8&depth=9)
+that covers an in-depth fix of Antidote installer for Ach linux.
+I also tried:
+```
+sudo pacman -S xhost
+sudo bash Antidote_9.5.2_B_21_Linux.bash
+```
+After installation, grant access X server to everyone
+```
+xhost +
+```
+It was important to execute Antidote_9.5.2_B_21_Linux.bash as sudo to avoid the error:
+```
+/usr/bin/env: ‘./Antidote_9.5.2_B_21_Linux.bash’: No such file or directory
+```
+
 ### Download mp3 from youtube videos
 ```bash
 pacman -S youtube-dl ffmpeg
