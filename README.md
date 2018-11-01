@@ -1162,7 +1162,7 @@ Manage your money (allow connection to your bank account with specific protocols
 Edit pdfs
 `masterpdfeditor`
 Analyse Disk usage
-`baobab`
+`baobab` or even better : `ncdu`
 
 (from http://sametmax.com/mon-environnement-de-travail/)
 Agregator of RS feeds (have a look at "Tiny RSS" too)
@@ -1285,3 +1285,23 @@ Solve icon of sublime, with plank, cannot be toggled to the dock (http://www.tec
     OnlyShowIn=XFCE;
     Icon=sublime-text
 
+### Tricks to debug a binary file
+```
+sudo pacman -s strace
+```
+Start the binary with strace
+```
+strace <command>
+```
+
+### Tricks with pacman
+
+Delete all cached versions of installed and uninstalled packages except most recent 2 versions of packages
+```
+sudo paccache -k2 -r
+```
+
+Edit configuration files after upgrade
+```
+sudo pacdiff
+```
