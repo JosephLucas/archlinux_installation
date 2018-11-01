@@ -1,7 +1,7 @@
 ## Backup any data
 
 ### Backup a linux OS
-(https://wiki.archlinux.org/index.php/Rsync#Full_system_backup)
+[using rsync](https://wiki.archlinux.org/index.php/Rsync#Full_system_backup)
 
 Download a list of ignored folders and files
 ```bash
@@ -158,7 +158,7 @@ Try to ping google.com
 ```bash
 ping google.com
 ```
-Use *elinks* to browse the internet in CLI (Command Line Interface), for instance https://wiki.archlinux.org/index.php/Installation_guide
+Use *elinks* to browse the internet in CLI (Command Line Interface), for instance to read [arch linux intallation guide](https://wiki.archlinux.org/index.php/Installation_guide).
 ```bash
 elink https://github.com/JosephLucas/archlinux_installation
 ```
@@ -206,8 +206,8 @@ If you plan to resize some logival volumes, do not forget to:
 * shrink the file system **before** shrinking the logical volume
 * extend the logical volume **before** extending the file system)
 
-If LVM partitions are used, the ESP is mounted at /boot; contrary to the standard mountpoint of the ESP.
-(cf http://www.rodsbooks.com/refind/installing.html). Cause, rEFInd doesn't seem to read LVM partitions whereas Arch
+[If LVM partitions are used, the ESP is mounted at /boot; contrary to the standard mountpoint of the ESP](http://www.rodsbooks.com/refind/installing.html).
+Cause, rEFInd doesn't seem to read LVM partitions whereas Arch
 installs bootloader and iniramfs into /boot with pacstrap and mkinitcpio.
 Another solution would be to move the images and the refind_linux.conf from /boot/ (into LVM/ext4) to /boot/efi
 (into the ESP) each time they are upgraded :
@@ -220,7 +220,7 @@ Just before creating an initial ramdisk environment (mkinitcpio), add 'lvm2" in 
 The order seems important.
 
 ### Do not make a swap partition
-Do not make a *swap*, use instead a *swap file*, it is more flexible. (see https://wiki.archlinux.org/index.php/swap#Swap_file)
+Do not make a *swap*, use instead a *[swap file](https://wiki.archlinux.org/index.php/swap#Swap_file)*, it is more flexible.
 
 ### Mount partitions
 With:
@@ -365,8 +365,7 @@ reboot
 ## Post-Installation configuration
 
 ### Micro-code of Intel CPUs
-Look for your processor model at 
-https://downloadcenter.intel.com/fr/product/65707/Intel-Core-i5-3317U-Processor-3M-Cache-up-to-2-60-GHz-
+Look for your processor model at [intel's webpage](https://downloadcenter.intel.com/fr/product/65707/Intel-Core-i5-3317U-Processor-3M-Cache-up-to-2-60-GHz-).
 
 If you need microcode,
 ```bash 
@@ -380,7 +379,7 @@ After a reboot, check that microcode is 'updated early'
 dmesg | grep microcode
 ```
 ### Activate TRIM (for saving your an SSD lifetime)
-Following https://wiki.archlinux.org/index.php/Solid_State_Drives#Maximizing_performance
+Following [arch's wiki](https://wiki.archlinux.org/index.php/Solid_State_Drives#Maximizing_performance).
 
 Check if you have a ssd disk with a TRIM available 
 ```bash
@@ -393,9 +392,8 @@ Enable fstrim.timer to be started on bootup
 systemctl enable fstrim.timer
 ```
 ### Optimize SSD
-From https://wiki.archlinux.fr/SSD#Option_de_montage_noatime
-
-Add option **noatime** in /etc/fstab for partitions on the ssd. (It should already be the case by default)
+[Arch's wiki recomands to](https://wiki.archlinux.fr/SSD#Option_de_montage_noatime)
+add option **noatime** in /etc/fstab for partitions on the ssd. (It should already be the case by default)
 
 ### Desktop environment xfce4
 Start the graphical window manager
@@ -455,7 +453,7 @@ ip link show
 ```
 Note the names of the interfaces (for instance 'lo' and 'wlp3s0').
 
-Automatically connect to the wifi (https://wiki.archlinux.fr/Netctl#Connexion_automatique_.C3.A0_un_profil)
+[Automatically connect to the wifi](https://wiki.archlinux.fr/Netctl#Connexion_automatique_.C3.A0_un_profil)
 ```bash
 pacman -S wpa_actiond
 systemctl enable netctl-auto@wlp3s0.service
@@ -468,8 +466,7 @@ Get the ethernet interface with
 ```bash
 ip link
 ```
-Then, to enable auto-connection when the ethernet cable is plugged in/unplugged
-(https://wiki.archlinux.org/index.php/netctl#Usage)
+Then, to [enable auto-connection when the ethernet cable is plugged in/unplugged](https://wiki.archlinux.org/index.php/netctl#Usage)
 ```bash
 sudo pacman -S ifplugd
 sudo systemctl start netctl-ifplugd@<ethernet-interface>.service
@@ -488,8 +485,8 @@ passwd <user>
 visudo
 ```
 ### Make zsh the default shell
-(NB: Overall ranking of zsh configs seems to be `grml-zsh-config` > `prezto` > `Oh-my-zsh.` The two former frameworks are bloated. 
-From https://www.reddit.com/r/unixporn/comments/48wmfr/zsh_users_which_do_you_prefer_oh_my_zsh_or_prezto/)
+NB: Overall ranking of zsh configs seems to be `grml-zsh-config` > `prezto` > `Oh-my-zsh.` [The two former frameworks are bloated](https://www.reddit.com/r/unixporn/comments/48wmfr/zsh_users_which_do_you_prefer_oh_my_zsh_or_prezto/).
+
 Install the default config for arch (same as in the USB stick)
 ```bash
 pacman -S grml-zsh-config
@@ -527,7 +524,7 @@ Settings > LightDM + Greeter > background image
 localctl --no-convert set-x11-keymap fr
 ``` 
 ### Swap file
-(see https://wiki.archlinux.org/index.php/Swap#Swap_file)
+From the [arch wiki page](https://wiki.archlinux.org/index.php/Swap#Swap_file)
 ```bash
 fallocate -l 4G /swapfile
 chmod 600 /swapfile
@@ -559,7 +556,7 @@ When 85% RAM is used (15% of free ram is remaining), the kernel is allowed to us
 ### Setting touchpad
 In  Applications > Setting > Mouse and Touchpad, set tap click and scrolling.
 
-(If necessary install xf86-input-synaptics with pacman and read https://wiki.archlinux.fr/Touchpad_Synaptics)
+(If necessary install xf86-input-synaptics with pacman and follow [arch wiki page](https://wiki.archlinux.fr/Touchpad_Synaptics))
 
 ### Auto-mount USB devices
 ```bash
@@ -586,7 +583,7 @@ sudo mv /usr/lib/thunarx-3/thunar-wallpaper-plugin.so{,.disabled}
 #### Add custom actions, when right click on a file/folder
 Add a custom action Edit->Configure custom actions...
 
-Have a look at https://docs.xfce.org/xfce/thunar/custom-actions
+[Examples of custom actions](https://docs.xfce.org/xfce/thunar/custom-actions)
 
 (trick: to monitor/debug a xfce channel
 ```
@@ -603,7 +600,7 @@ Shrink Asus logo to 800px in width and 24bits depth for colors.
 ```bash
 convert -colors 256 -depth 24 +dither -resize 800 ~/Desktop/logo_asus.png ~/Desktop/logo_asus_24b.png
 ```
-Download snowy icons (https://sourceforge.net/projects/refind/files/themes/)
+[Download snowy icons](https://sourceforge.net/projects/refind/files/themes/)
 ```bash
 pacman zip unzip
 ```
@@ -681,7 +678,7 @@ Install an extension for black background on firefox
 ``'Dark Background and Light Text'
 ```
 
-Set wallpaper : http://cinderwick.ca/files/archlinux/wallpaper/archlinux-xfce-azul.jpg
+Set the [arch-xfce wallpaper](http://cinderwick.ca/files/archlinux/wallpaper/archlinux-xfce-azul.jpg) or the [beautiful night wallpaper](http://www.widehdimages.com/beautiful-night-wide-wallpapers/).
 
 Remove some icons (specially important for avoiding drag-n-drop in root)
 
@@ -722,8 +719,8 @@ mkdir -p ~/.config/autostart
 mv conky.desktop ~/.config/autostart
 ```
 
-(inspiration: last post of angstrom https://forum.xfce.org/viewtopic.php?id=6847)
-(documentation http://conky.sourceforge.net/config_settings.html)
+(inspiration: [last post of angstrom](https://forum.xfce.org/viewtopic.php?id=6847) and
+[documentation](http://conky.sourceforge.net/config_settings.html))
 
 ### Plank dock (Macos like panel)
 ```bash
@@ -748,17 +745,16 @@ Fix trouble editing the account top-left xfce whisker menu
 trizen -S mugshot
  ```
 
-###Low battery warning
-First tried to set a systemd/timer for notify-send but (https://stackoverflow.com/a/49617812) advised not to do that.
-Finally opted for 1) of (https://bbs.archlinux.org/viewtopic.php?id=189307)
+### Fix low battery warning
+First tried to set a systemd/timer for notify-send but a [post](https://stackoverflow.com/a/49617812) advised not to do that.
+Finally opted the solution for 1) in [forum page](https://bbs.archlinux.org/viewtopic.php?id=189307)
 
-Install a tool to monitor battery (https://unix.stackexchange.com/a/60936)
+Install a [tool to monitor battery](https://unix.stackexchange.com/a/60936)
 ```bash
 pacman -S acpi
 ```
 
-Download and install daemon script
-(https://wiki.archlinux.org/index.php/Systemd/Timers)
+[Arch wiki page on timers]((https://wiki.archlinux.org/index.php/Systemd/Timers)) advises to download and install a daemon script
 ```bash
 wget https://raw.githubusercontent.com/JosephLucas/archlinux_installation/master/low_battery_warning.sh
 sudo install -o root -g root -m 755 low_battery_warning.sh /usr/local/bin
@@ -791,7 +787,7 @@ pacman -S wget rsync aria2 uget
 ```
 
 ### Mail client : neomutt
-see https://www.neomutt.org/distro/arch
+[Arch installation process](https://www.neomutt.org/distro/arch)
 ```bash
 mkdir -p /tmp/makepkg && cd /tmp/makepkg
 wget https://aur.archlinux.org/cgit/aur.git/snapshot/neomutt.tar.gz
@@ -801,7 +797,7 @@ makepkg -si
 ```
 ### Drivers
 #### NVIDIA optimus graphic cards
-(see https://wiki.archlinux.org/index.php/NVIDIA_Optimus)
+[Arch wiki page](https://wiki.archlinux.org/index.php/NVIDIA_Optimus)
 
 Find out the model of your graphic card
 ```bash
@@ -809,11 +805,10 @@ lspci | grep -E "VGA|3D"
 ```
 
 ### Graphic cards (Optimus = (HD4000 + Geforce GT 620 M))
-https://www.reddit.com/r/linux_gaming/comments/6ftq10/the_ultimate_guide_to_setting_up_nvidia_optimus/
+[A guide on reddit](https://www.reddit.com/r/linux_gaming/comments/6ftq10/the_ultimate_guide_to_setting_up_nvidia_optimus/)
 
-1) install bumblebee
+1) [install bumblebee with intell support](https://wiki.archlinux.org/index.php/Bumblebee#Installing_Bumblebee_with_Intel.2FNVIDIA)
 
-https://wiki.archlinux.org/index.php/Bumblebee#Installing_Bumblebee_with_Intel.2FNVIDIA
 Ensure you have enabled "multilib" repository: be sure both lines are uncommented in `/etc/pacman.conf`
 
     [multilib]
@@ -848,7 +843,7 @@ In `~/.nvidia-xinitrc`, add a line that starts `openbox-session`
 echo -e '# start the window manager\nopenbox-session' >> ~/.nvidia-xinitrc
 ```
 
-Configure Openbox (https://wiki.archlinux.org/index.php/openbox#Configuration)
+[Configure Openbox](https://wiki.archlinux.org/index.php/openbox#Configuration)
 ```bash
 cp -R /etc/xdg/openbox ~/.config/
 ```
@@ -933,10 +928,9 @@ with ~/.local/share/icons/hicolor/*/apps/1CD8_rundll32.0.png convenient icons of
 
 To update the icon cache, log out and in.
 ### Fix blackscreen and error when starting Heroes Of The Storm
-https://eu.battle.net/forums/en/heroes/topic/17612391410
 
 Before starting the game (from battlenet client app)
-Game settings > additional command line arguments > "-dx9"
+[Game settings > additional command line arguments > "-dx9"](https://eu.battle.net/forums/en/heroes/topic/17612391410)
 
 ### Htop
 ```bash
@@ -1000,7 +994,7 @@ pacman -S p7zip p7zip-plugins tar
 ```
 
 ### Fix screen tearing issues with the default window compositor of xfce4
-XFCE default compositing window manager (https://wiki.archlinux.org/index.php/Xorg#Composite) and default nvidia configuration had me experience screen tearing.
+[XFCE default compositing window manager](https://wiki.archlinux.org/index.php/Xorg#Composite) and default nvidia configuration had me experience screen tearing.
 
 A solution is to install *compton*, a 'compositing window manager
 
@@ -1008,13 +1002,10 @@ Deactivate default xfce composite manager (window manager tweak-> manager->Disab
 ```bash
 pacman -S compton
 ```
-then follow 
-https://ubuntuforums.org/showthread.php?t=2144468&p=12644745#post12644745
+then [this discussion](https://ubuntuforums.org/showthread.php?t=2144468&p=12644745#post12644745)
 for configuration with xfce.
 
-Other tried solution (Tried and crashed my graphic server):
-
-https://wiki.archlinux.org/index.php/Intel_graphics#Tear-free_video
+Otherwise I tried [this solution](https://wiki.archlinux.org/index.php/Intel_graphics#Tear-free_video) -- it crashed my graphic server.
 
 I created file : `/etc/X11/xorg.conf.d/20-intel.conf`
 with :
@@ -1039,7 +1030,7 @@ pacman -S file-roller
 Shift colors depending on the hour of the day (help your eyes hurt less if you are working in front of the screen at night)
 `redshift`
 
-[In order to allow access Redshift to use GeoClue2, add the following lines to /etc/geoclue/geoclue.conf](https://wiki.archlinux.org/index.php/redshift#Configuration):
+In order to allow access Redshift to use GeoClue2, [add the following lines to /etc/geoclue/geoclue.conf](https://wiki.archlinux.org/index.php/redshift#Configuration):
 ```
 [redshift]
 allowed=true
@@ -1083,15 +1074,15 @@ It was important to execute Antidote_9.5.2_B_21_Linux.bash as sudo to avoid the 
 pacman -S youtube-dl ffmpeg
 youtube-dl --extract-audio --audio-format mp3 <url>
 ```
-For more, https://askubuntu.com/questions/178481/how-to-download-an-mp3-track-from-a-youtube-video
+[For more info](https://askubuntu.com/questions/178481/how-to-download-an-mp3-track-from-a-youtube-video)
 
 ### Other packages
 `xkill`
 
 ## Hints and unsuccessful tries
 
-https://forum.owncloud.org/viewtopic.php?t=29048
-Non automatic login of owncloud-client at startup
+[Explanation why there is not a automatic login of owncloud-client at startup](https://forum.owncloud.org/viewtopic.php?t=29048)
+
 
 ### Thunar right click action "set as wallpaper" on a picture isn't working
 https://forum.xfce.org/viewtopic.php?id=12322
