@@ -631,6 +631,9 @@ At the end of `/boot/efi/EFI/refind/refind.conf` write
 
 Change 'scanfor manual' to hide other unconfigured bootloaders.
 ### Trizen for AUR packages
+
+[Please use `yay` instead of `trizen`](https://www.slant.co/versus/4910/23118/~trizen_vs_yay)
+
 ```bash
 git clone https://aur.archlinux.org/trizen-git.git
 cd trizen-git
@@ -650,6 +653,59 @@ cp /etc/netctl/examples/ethernet-dhcp /etc/netctl/
 netctl start ethernet-dhcp
 netctl enable ethernet-dhcp
 ```
+
+### Use [systemd-networkd](https://wiki.archlinux.org/index.php/Systemd-networkd)
+[Good tuto : systemd-networkd + wpa_supplicant](https://remy.grunblatt.org/using-systemd-networkd-with-wpa_supplicant-to-manage-wireless-network-configuration.html)
+
+Stop `netctl` services (or any other network manager daemon) and start sytemd-networkd daemon
+```
+sudo systemctl stop netctl
+sudo systemctl disable netctl
+sudo systemctl start systemd-networkd
+```
+#### Configure systemd-networkd
+Configure wired *eth*ernet connexions
+```
+sudo tee /etc/systemd/network/eth.network << EOF
+[Match]
+# Will match eth0, eth1, ethX…
+Name=eth*
+[Network]
+DHCP=yes
+EOF
+```
+
+Get the wifi interface (link) with `networkctl list`. In my case it is `wlp3s0`.
+Configure wireless connections (NB `wlp3s0` in the filename, it' important to put your interface name here)
+```
+sudo tee /etc/systemd/network/wlp3s0.network << EOF
+[Match]
+Name=wlp3s0
+[Network]
+DHCP=yes
+EOF
+```
+#### configure `wpa_supplicant` for wifi
+Make sure you use a WPA/WPA2 protocol (following instructions do not work with deprecated WEP).
+```
+echo "please enter wifi pasword:"
+read -s PWD
+wpa_passphrase LUCAS_PARIS $PWD | grep -v "#psk=" | sudo tee /etc/wpa_supplicant/wpa_supplicant-wlp3s0.conf
+```
+Make a symlink from `/run/systemd/resolve/resolv.conf` to `/etc/resolv.conf`
+```
+# starting the daemon creates `/run/systemd/resolve/resolv.conf`
+sudo systemctl start systemd-resolved
+sudo rm /etc/resolv.conf
+sudo ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf
+```
+Start and enable all services
+```
+sudo systemctl restart systemd-networkd systemd-resolved wpa_supplicant@wlp3s0
+sudo systemctl enable systemd-networkd systemd-resolved wpa_supplicant@wlp3s0
+```
+(wpa_supplicant@wlp3s0 means wpa_supplicant service with parameter wlp3s0)
+
 ### Pycharm
 IDE python : pychamr
 ```bash
@@ -1296,3 +1352,33 @@ Edit configuration files after upgrade
 ```
 sudo pacdiff
 ```
+
+### Install lineageos on one plus one
+Instructions come from this [HOWTO](http://shoxx-website.com/2017/01/migration-dun-oneplus-one-cyanogenos-vers-lineageos.html)
+
+[Install ADB on the computer](https://wiki.archlinux.org/index.php/Android_Debug_Bridge)
+```
+pacman -S android-tools
+pacman -S android-udev
+```
+Plug the phone with USB and enable USB Debugging on your phone or device.
+This is usually done from Settings > Devoper options > Activate all ADB switches
+
+Then assert that `adb devices` shows it as "device" and not as "unauthorized".
+A popup window might call to accept the computer connection.
+
+To mount the android FS without sudo right on the smartphone
+```
+mkdir -p ~/Dev ~/one_plus_one
+cd ~/Dev
+git clone git://github.com/spion/adbfs-rootless.gi
+make
+```
+Mount the smarphone FS on `~/one_plus_one`
+```
+./adbfs  ~/one_plus_one
+```
+Now FS should be accessible in `~/one_plus_one`
+
+
+
